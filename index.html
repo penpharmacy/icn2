@@ -81,7 +81,7 @@
         </div>
 
         <div class="card p-3">
-            <h5 class="section-title">สัดส่วนวิธีปฏิบัติแยกตาม Moment (%)</h5>
+            <h5 class="section-title">สัดส่วนวิธีปฏิบัติแยกตาม Moment (%) (เทียบจากโอกาสทั้งหมดในทุก Moment)</h5>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm text-center">
                     <thead class="table-light">
@@ -96,6 +96,7 @@
                     <tbody id="momentDetailTableBody"></tbody>
                 </table>
             </div>
+            <p class="small text-muted mt-1">* เปอร์เซ็นต์ในตารางนี้คำนวณจากโอกาสทั้งหมด (Total Opportunities = จำนวนเคส × 5)</p>
         </div>
 
         <div class="row g-2">
@@ -178,8 +179,7 @@
     }
 
     function resetDashboard() {
-        ['hw_val', 'hr_val', 'comp_val', 'equip_val'].forEach(id => document.getElementById(id).innerText = '0%');
-        ['hw_frac', 'hr_frac', 'comp_frac', 'equip_frac'].forEach(id => document.getElementById(id).innerText = '(0/0)');
+        ['hw_val', 'hw_frac', 'hr_val', 'hr_frac', 'comp_val', 'comp_frac', 'equip_val', 'equip_frac'].forEach(id => document.getElementById(id).innerText = (id.includes('val') ? '0%' : '(0/0)'));
         ['momentTableBody', 'momentDetailTableBody', 'deptTableBody', 'roleTableBody', 'equipTableBody', 'equipSummaryTableBody'].forEach(id => {
             document.getElementById(id).innerHTML = '';
         });
@@ -229,7 +229,7 @@
         drawEquipDeptChart(data);
         renderTables(data, n);
         renderEquipTable(data);
-        renderMomentTableDetail(data, n); // เรียกใช้ฟังก์ชันใหม่
+        renderMomentTableDetail(data, n); 
     }
 
     function drawPie(hw, hr, none, glove) {
@@ -274,20 +274,25 @@
         renderTableFraction(data, 'role', 'roleTableBody');
     }
 
-    // ฟังก์ชันสร้างตารางแยกตาม Moment แบบละเอียด (เลียนแบบตารางแผนก)
+    // แก้ไขฟังก์ชันใหม่: คำนวณ % จากตัวหารรวมทั้งหมด (n * 5)
     function renderMomentTableDetail(data, n) {
         const body = document.getElementById('momentDetailTableBody');
         body.innerHTML = '';
         const momentLabels = ["1. ก่อนสัมผัสผู้ป่วย", "2. ก่อนทำหัตถการปลอดเชื้อ", "3. หลังสัมผัสสารคัดหลั่งผู้ป่วย", "4. หลังสัมผัสผู้ป่วย", "5. หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
         
+        // ตัวหารคือโอกาสทั้งหมด
+        const totalOpp = n * 5;
+
         momentLabels.forEach((label, idx) => {
             let s = { HW: 0, HR: 0, None: 0, Glove: 0 };
             data.forEach(d => { if (d.m && d.m[idx]) s[d.m[idx]]++; });
+            
             const fmt = (c) => {
-                let pct = ((c / n) * 100).toFixed(1);
+                let pct = totalOpp > 0 ? ((c / totalOpp) * 100).toFixed(1) : "0.0";
                 let colorClass = getPercentColor(pct);
-                return `<span class="${colorClass}">${pct}%</span><br><span class="text-muted" style="font-size:0.7rem">(${c}/${n})</span>`;
+                return `<span class="${colorClass}">${pct}%</span><br><span class="text-muted" style="font-size:0.7rem">(${c}/${totalOpp})</span>`;
             };
+            
             body.innerHTML += `<tr><td class="text-start fw-bold">${label}</td><td>${fmt(s.HW)}</td><td>${fmt(s.HR)}</td><td>${fmt(s.None)}</td><td>${fmt(s.Glove)}</td></tr>`;
         });
     }
