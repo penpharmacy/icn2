@@ -349,6 +349,46 @@
         XLSX.utils.book_append_sheet(wb, ws, "HandHygiene_Data");
         XLSX.writeFile(wb, "IC_HandHygiene_Full_Report.xlsx");
     }
+function renderDeptMomentOpportunity(data) {
+    const body = document.getElementById('deptMomentOppBody');
+    body.innerHTML = '';
+
+    const depts = [...new Set(data.map(d => d.dept))];
+    const moments = 5;
+
+    depts.forEach(dept => {
+        const rows = data.filter(d => d.dept === dept);
+        let html = `<tr><td class="text-start fw-bold">${dept}</td>`;
+
+        for (let i = 0; i < moments; i++) {
+            let s = { HW: 0, HR: 0, None: 0, Glove: 0 };
+
+            rows.forEach(r => {
+                if (r.m && r.m[i]) {
+                    s[r.m[i]]++;
+                }
+            });
+
+            const total = s.HW + s.HR + s.None + s.Glove;
+
+            if (total === 0) {
+                html += `<td colspan="5" class="text-muted">-</td>`;
+            } else {
+                const pct = v => ((v / total) * 100).toFixed(1);
+                html += `
+                    <td>${pct(s.HW)}%</td>
+                    <td>${pct(s.HR)}%</td>
+                    <td>${pct(s.None)}%</td>
+                    <td>${pct(s.Glove)}%</td>
+                    <td class="fw-bold text-success">100%</td>
+                `;
+            }
+        }
+        html += `</tr>`;
+        body.innerHTML += html;
+    });
+}
+    
 </script>
 </body>
 </html>
