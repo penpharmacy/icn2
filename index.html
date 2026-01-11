@@ -85,6 +85,32 @@
             <div class="col-md-6"><div class="card p-3"><h5 class="section-title">แยกตามวิชาชีพ (%)</h5><table class="table table-bordered table-sm text-center"><thead class="table-light"><tr><th>วิชาชีพ</th><th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th></tr></thead><tbody id="roleTableBody"></tbody></table></div></div>
         </div>
 
+<div class="card p-3 mt-3">
+    <h5 class="section-title text-primary">
+        สรุป 5 Moments แบบ Opportunity-based แยกตามแผนก (%)
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th rowspan="2">แผนก</th>
+                    <th colspan="5">ก่อนสัมผัสผู้ป่วย</th>
+                    <th colspan="5">ก่อนทำหัตถการปลอดเชื้อ</th>
+                    <th colspan="5">หลังสัมผัสสารคัดหลั่ง</th>
+                    <th colspan="5">หลังสัมผัสผู้ป่วย</th>
+                    <th colspan="5">หลังสัมผัสสิ่งแวดล้อม</th>
+                </tr>
+                <tr>
+                    <!-- ซ้ำ HW HR None Glove Total -->
+                    ${Array(5).fill('<th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th><th>รวม</th>').join('')}
+                </tr>
+            </thead>
+            <tbody id="deptMomentOppBody"></tbody>
+        </table>
+    </div>
+</div>
+
+        
         <div class="card p-3">
             <h5 class="section-title">ความพร้อมใช้อุปกรณ์และสรุปกลุ่มน้ำยาแยกตามแผนก (%)</h5>
             <div class="row g-3">
