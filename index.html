@@ -21,7 +21,6 @@
         .chart-container { position: relative; height: 200px; width: 100%; }
         h6.chart-label { font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #555; height: 2.4em; display: flex; align-items: center; justify-content: center; text-align: center; }
         .table { font-size: 0.82rem; }
-        .badge-moment { width: 35px; display: inline-block; font-size: 0.7rem; }
         @media print { .no-print { display: none !important; } .card { box-shadow: none; border: 1px solid #ddd; } }
     </style>
 </head>
@@ -87,22 +86,23 @@
         </div>
 
         <div class="card p-3">
-            <h5 class="section-title">วิเคราะห์การปฏิบัติรายโอกาส (Individual Audit Records /5)</h5>
+            <h5 class="section-title">วิเคราะห์การปฏิบัติรายโอกาส (Individual Audit Records /5 Moments)</h5>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm text-center align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>ลำดับ</th>
-                            <th>วันที่</th>
-                            <th>แผนก</th>
-                            <th>วิชาชีพ</th>
-                            <th>M1</th>
-                            <th>M2</th>
-                            <th>M3</th>
-                            <th>M4</th>
-                            <th>M5</th>
-                            <th class="table-primary text-dark">คะแนน (/5)</th>
-                            <th class="table-primary text-dark">%</th>
+                            <th rowspan="2">ลำดับ</th>
+                            <th rowspan="2">วันที่</th>
+                            <th rowspan="2">แผนก</th>
+                            <th rowspan="2">วิชาชีพ</th>
+                            <th colspan="4">สรุปการปฏิบัติ (%)</th>
+                            <th rowspan="2" class="table-primary text-dark">รวม Compliance (HW+HR)</th>
+                        </tr>
+                        <tr class="table-secondary text-dark" style="font-size: 0.75rem;">
+                            <th>HW</th>
+                            <th>HR</th>
+                            <th>ไม่ล้าง (X)</th>
+                            <th>ถุงมือ (G)</th>
                         </tr>
                     </thead>
                     <tbody id="individualTableBody"></tbody>
@@ -190,9 +190,7 @@
         ['momentTableBody', 'deptTableBody', 'roleTableBody', 'equipTableBody', 'equipSummaryTableBody', 'individualTableBody'].forEach(id => {
             document.getElementById(id).innerHTML = '';
         });
-        for (let key in charts) {
-            if (charts[key]) { charts[key].destroy(); charts[key] = null; }
-        }
+        for (let key in charts) { if (charts[key]) charts[key].destroy(); }
     }
 
     function getPercentColor(pct) {
@@ -234,37 +232,38 @@
         drawEquipDeptChart(data);
         renderTables(data, n);
         renderEquipTable(data);
-        renderIndividualTable(data); // เรียกฟังก์ชันตารางใหม่
-    }
-
-    // --- Helper for Individual Moments ---
-    function getMomentBadge(val) {
-        if (val === 'HW') return '<span class="badge bg-success badge-moment">HW</span>';
-        if (val === 'HR') return '<span class="badge bg-info badge-moment">HR</span>';
-        if (val === 'None') return '<span class="badge bg-danger badge-moment">X</span>';
-        if (val === 'Glove') return '<span class="badge bg-warning text-dark badge-moment">G</span>';
-        return '<span class="text-muted">-</span>';
+        renderIndividualTable(data);
     }
 
     function renderIndividualTable(data) {
         const body = document.getElementById('individualTableBody');
         body.innerHTML = '';
         data.forEach((d, idx) => {
-            const score = d.m ? d.m.filter(v => v === 'HW' || v === 'HR').length : 0;
-            const pct = ((score / 5) * 100).toFixed(0);
+            const counts = {
+                HW: d.m ? d.m.filter(v => v === 'HW').length : 0,
+                HR: d.m ? d.m.filter(v => v === 'HR').length : 0,
+                None: d.m ? d.m.filter(v => v === 'None').length : 0,
+                Glove: d.m ? d.m.filter(v => v === 'Glove').length : 0
+            };
+            const pcts = {
+                HW: ((counts.HW / 5) * 100).toFixed(0),
+                HR: ((counts.HR / 5) * 100).toFixed(0),
+                None: ((counts.None / 5) * 100).toFixed(0),
+                Glove: ((counts.Glove / 5) * 100).toFixed(0)
+            };
+            const totalCompPct = (parseFloat(pcts.HW) + parseFloat(pcts.HR)).toFixed(0);
+
             body.innerHTML += `
                 <tr>
                     <td>${idx + 1}</td>
                     <td>${d.obsDate ? d.obsDate.substring(0, 10) : '-'}</td>
                     <td class="text-start">${d.dept || '-'}</td>
                     <td>${d.role || '-'}</td>
-                    <td>${getMomentBadge(d.m[0])}</td>
-                    <td>${getMomentBadge(d.m[1])}</td>
-                    <td>${getMomentBadge(d.m[2])}</td>
-                    <td>${getMomentBadge(d.m[3])}</td>
-                    <td>${getMomentBadge(d.m[4])}</td>
-                    <td class="fw-bold fs-6">${score}</td>
-                    <td class="${getPercentColor(pct)}">${pct}%</td>
+                    <td class="${pcts.HW > 0 ? 'text-success fw-bold' : 'text-muted'}">${pcts.HW}%</td>
+                    <td class="${pcts.HR > 0 ? 'text-info fw-bold' : 'text-muted'}">${pcts.HR}%</td>
+                    <td class="${pcts.None > 0 ? 'text-danger' : 'text-muted'}">${pcts.None}%</td>
+                    <td class="${pcts.Glove > 0 ? 'text-warning text-dark' : 'text-muted'}">${pcts.Glove}%</td>
+                    <td class="table-primary fw-bold ${getPercentColor(totalCompPct)}">${totalCompPct}%</td>
                 </tr>`;
         });
     }
@@ -355,17 +354,13 @@
             const hasSoapOrAlco = d.equips ? (d.equips[1] === 1 || d.equips[2] === 1 || d.equips[3] === 1) : false;
             return {
                 "วันที่": d.obsDate || "", "แผนก": d.dept || "", "วิชาชีพ": d.role || "",
-                "Moment 1": d.m ? d.m[0] : "", "Moment 2": d.m ? d.m[1] : "", "Moment 3": d.m ? d.m[2] : "", "Moment 4": d.m ? d.m[3] : "", "Moment 5": d.m ? d.m[4] : "",
-                "Compliance (%)": ((cpCount/5)*100).toFixed(1), "Hand Hygiene (Score/Total)": `${cpCount}/5`,
-                "กลุ่มน้ำยาล้างมือ (สรุป)": hasSoapOrAlco ? "พร้อม" : "ไม่พร้อม",
-                "อุปกรณ์ 1 (อ่าง)": d.equips ? (d.equips[0] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 2 (สบู่)": d.equips ? (d.equips[1] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 3 (4%CHG)": d.equips ? (d.equips[2] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 4 (Alcohol)": d.equips ? (d.equips[3] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 5 (กระดาษ)": d.equips ? (d.equips[4] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 6 (โปสเตอร์)": d.equips ? (d.equips[5] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 7 (ถังขยะ)": d.equips ? (d.equips[6] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "ความพร้อมอุปกรณ์รวม (%)": ((eqCount/7)*100).toFixed(1)
+                "HW (%)": d.m ? ((d.m.filter(v=>v==='HW').length/5)*100).toFixed(0) : 0,
+                "HR (%)": d.m ? ((d.m.filter(v=>v==='HR').length/5)*100).toFixed(0) : 0,
+                "ไม่ล้าง (%)": d.m ? ((d.m.filter(v=>v==='None').length/5)*100).toFixed(0) : 0,
+                "สวมถุงมือ (%)": d.m ? ((d.m.filter(v=>v==='Glove').length/5)*100).toFixed(0) : 0,
+                "Compliance Overall (%)": ((cpCount/5)*100).toFixed(1),
+                "น้ำยาพร้อม?": hasSoapOrAlco ? "พร้อม" : "ไม่พร้อม",
+                "อุปกรณ์รวม (%)": ((eqCount/7)*100).toFixed(1)
             };
         });
         const ws = XLSX.utils.json_to_sheet(exportData);
