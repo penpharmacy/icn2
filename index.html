@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report: IC Hand Hygiene Audit - โรงพยาบาลพุนพิน</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body { font-family: 'Sarabun', sans-serif; background-color:#f4f7f6; }
+.header-banner { background: linear-gradient(135deg,#1d976c,#93f9b9); color:#fff; padding:15px; border-radius:0 0 20px 20px; }
+.card { border-radius:12px; border:none; box-shadow:0 2px 8px rgba(0,0,0,.05); margin-bottom:12px; }
+.section-title { border-left:5px solid #1d976c; padding-left:12px; font-weight:700; color:#1d976c; }
+.table { font-size:.82rem; }
+.chart-container { height:200px; }
+.no-print { }
+@media print { .no-print { display:none!important; } }
+</style>
+</head>
+
+<body>
+
+<div class="header-banner text-center mb-3 no-print">
+<h4 class="fw-bold mb-0"><i class="fas fa-chart-line"></i> รายงานผล IC Hand Hygiene Audit โรงพยาบาลพุนพิน</h4>
+</div>
+
+<div class="container-fluid px-3">
+
+<!-- FILTER -->
+<div class="card p-2 no-print bg-light">
+<div class="row g-2 align-items-end justify-content-center">
+<div class="col-md-3">
+<label class="small fw-bold">รูปแบบรายงาน</label>
+<select id="filterType" class="form-select form-select-sm" onchange="toggleFilterInputs()">
+<option value="all">ข้อมูลทั้งหมด</option>
+<option value="month">รายเดือน</option>
+<option value="year">รายปี</option>
+<option value="range">ช่วงวันที่</option>
+</select>
+</div>
+<div id="monthFilterGroup" class="col-md-2" style="display:none">
+<input type="month" id="filterMonth" class="form-control form-control-sm">
+</div>
+<div id="yearFilterGroup" class="col-md-2" style="display:none">
+<input type="number" id="filterYear" class="form-control form-control-sm" placeholder="2026">
+</div>
+<div id="rangeFilterGroupStart" class="col-md-2" style="display:none">
+<input type="date" id="filterStart" class="form-control form-control-sm">
+</div>
+<div id="rangeFilterGroupEnd" class="col-md-2" style="display:none">
+<input type="date" id="filterEnd" class="form-control form-control-sm">
+</div>
+<div class="col-md-2">
+<button class="btn btn-primary btn-sm w-100" onclick="updateReports()">อัปเดต</button>
+</div>
+</div>
+</div>
+
+<div id="reportArea">
+
+<!-- MOMENT NORMAL -->
+<div class="card p-3">
+<h5 class="section-title">สรุป 5 Moments สำหรับการล้างมือ</h5>
+<table class="table table-bordered table-sm text-center">
+<thead class="table-light">
+<tr>
+<th class="text-start">Moment</th>
+<th>HW</th>
+<th>HR</th>
+<th>ไม่ล้าง</th>
+<th>ถุงมือ</th>
+</tr>
+</thead>
+<tbody id="momentTableBody"></tbody>
+</table>
+</div>
+
+<!-- OPPORTUNITY BASED -->
+<div class="card p-3 mt-3">
+<h5 class="section-title text-primary">สรุป 5 Moments (Opportunity-based %)</h5>
+<table class="table table-bordered table-sm text-center">
+<thead class="table-light">
+<tr>
+<th class="text-start">Moment</th>
+<th>HW (%)</th>
+<th>HR (%)</th>
+<th>ไม่ล้าง (%)</th>
+<th>ถุงมือ (%)</th>
+<th>รวม (%)</th>
+</tr>
+</thead>
+<tbody id="momentOpportunityBody"></tbody>
+</table>
+</div>
+
+</div>
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbx58a1xS-6se0SXJ_pyfPsk7wIPZlz9I6OGcksrA3ohJ9hkHloZVTbdD9a27HpbGK8QbQ/exec";
+let database=[];
+
+window.onload=()=>fetch(SCRIPT_URL).then(r=>r.json()).then(d=>{database=d;updateReports();});
+
+function toggleFilterInputs(){
+const t=filterType.value;
+monthFilterGroup.style.display=t==="month"?"block":"none";
+yearFilterGroup.style.display=t==="year"?"block":"none";
+rangeFilterGroupStart.style.display=t==="range"?"block":"none";
+rangeFilterGroupEnd.style.display=t==="range"?"block":"none";
+}
+
+function updateReports(){
+let f=database;
+if(filterType.value==="month"&&filterMonth.value) f=database.filter(d=>d.obsDate?.substring(0,7)===filterMonth.value);
+if(filterType.value==="year"&&filterYear.value) f=database.filter(d=>d.obsDate?.substring(0,4)===filterYear.value);
+if(filterType.value==="range"&&filterStart.value&&filterEnd.value){
+f=database.filter(d=>d.obsDate>=filterStart.value&&d.obsDate<=filterEnd.value);
+}
+renderTables(f);
+renderMomentOpportunity(f);
+}
+
+function renderTables(data){
+const body=document.getElementById("momentTableBody");
+body.innerHTML="";
+const labels=["ก่อนสัมผัสผู้ป่วย","ก่อนทำหัตถการปลอดเชื้อ","หลังสัมผัสสารคัดหลั่งผู้ป่วย","หลังสัมผัสผู้ป่วย","หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
+labels.forEach((l,i)=>{
+let s={HW:0,HR:0,None:0,Glove:0};
+data.forEach(d=>{if(d.m)s[d.m[i]]++;});
+body.innerHTML+=`<tr>
+<td class="text-start">${l}</td>
+<td>${s.HW}</td>
+<td>${s.HR}</td>
+<td>${s.None}</td>
+<td>${s.Glove}</td>
+</tr>`;
+});
+}
+
+function renderMomentOpportunity(data){
+const body=document.getElementById("momentOpportunityBody");
+body.innerHTML="";
+const labels=["ก่อนสัมผัสผู้ป่วย","ก่อนทำหัตถการปลอดเชื้อ","หลังสัมผัสสารคัดหลั่งผู้ป่วย","หลังสัมผัสผู้ป่วย","หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
+
+labels.forEach((l,i)=>{
+let s={HW:0,HR:0,None:0,Glove:0};
+data.forEach(d=>{if(d.m&&d.m[i])s[d.m[i]]++;});
+const total=s.HW+s.HR+s.None+s.Glove;
+if(total===0){
+body.innerHTML+=`<tr><td class="text-start">${l}</td><td colspan="5" class="text-muted">ไม่มีการสังเกต</td></tr>`;
+return;
+}
+const p=v=>((v/total)*100).toFixed(1);
+body.innerHTML+=`<tr>
+<td class="text-start">${l}</td>
+<td>${p(s.HW)}%</td>
+<td>${p(s.HR)}%</td>
+<td>${p(s.None)}%</td>
+<td>${p(s.Glove)}%</td>
+<td class="fw-bold text-success">100%</td>
+</tr>`;
+});
+}
+</script>
+
+</body>
+</html>
