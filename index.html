@@ -21,6 +21,7 @@
         .chart-container { position: relative; height: 200px; width: 100%; }
         h6.chart-label { font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #555; height: 2.4em; display: flex; align-items: center; justify-content: center; text-align: center; }
         .table { font-size: 0.82rem; }
+        .badge-moment { width: 35px; display: inline-block; font-size: 0.7rem; }
         @media print { .no-print { display: none !important; } .card { box-shadow: none; border: 1px solid #ddd; } }
     </style>
 </head>
@@ -86,6 +87,30 @@
         </div>
 
         <div class="card p-3">
+            <h5 class="section-title">วิเคราะห์การปฏิบัติรายโอกาส (Individual Audit Records /5)</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>วันที่</th>
+                            <th>แผนก</th>
+                            <th>วิชาชีพ</th>
+                            <th>M1</th>
+                            <th>M2</th>
+                            <th>M3</th>
+                            <th>M4</th>
+                            <th>M5</th>
+                            <th class="table-primary text-dark">คะแนน (/5)</th>
+                            <th class="table-primary text-dark">%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="individualTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-3 mt-2">
             <h5 class="section-title">ความพร้อมใช้อุปกรณ์และสรุปกลุ่มน้ำยาแยกตามแผนก (%)</h5>
             <div class="row g-3">
                 <div class="col-lg-9">
@@ -150,7 +175,6 @@
             if (start && end) filtered = database.filter(d => { const dD = d.obsDate.substring(0, 10); return dD >= start && dD <= end; });
         }
 
-        // แจ้งเตือนและรีเซ็ตค่าหากไม่พบข้อมูล
         if (filtered.length === 0) {
             alert("ไม่พบข้อมูลในช่วงที่เลือก");
             resetDashboard();
@@ -161,28 +185,21 @@
     }
 
     function resetDashboard() {
-        // ล้างตัวเลขใน Card
         ['hw_val', 'hr_val', 'comp_val', 'equip_val'].forEach(id => document.getElementById(id).innerText = '0%');
         ['hw_frac', 'hr_frac', 'comp_frac', 'equip_frac'].forEach(id => document.getElementById(id).innerText = '(0/0)');
-
-        // ล้างตาราง
-        ['momentTableBody', 'deptTableBody', 'roleTableBody', 'equipTableBody', 'equipSummaryTableBody'].forEach(id => {
+        ['momentTableBody', 'deptTableBody', 'roleTableBody', 'equipTableBody', 'equipSummaryTableBody', 'individualTableBody'].forEach(id => {
             document.getElementById(id).innerHTML = '';
         });
-
-        // ล้างกราฟ
         for (let key in charts) {
-            if (charts[key]) {
-                charts[key].destroy();
-                charts[key] = null;
-            }
+            if (charts[key]) { charts[key].destroy(); charts[key] = null; }
         }
     }
 
     function getPercentColor(pct) {
         let val = parseFloat(pct);
         if (val === 0) return 'text-danger fw-bold'; 
-        if (val === 100) return 'text-success fw-bold';
+        if (val >= 80) return 'text-success fw-bold';
+        if (val < 50) return 'text-danger';
         return ''; 
     }
 
@@ -217,6 +234,39 @@
         drawEquipDeptChart(data);
         renderTables(data, n);
         renderEquipTable(data);
+        renderIndividualTable(data); // เรียกฟังก์ชันตารางใหม่
+    }
+
+    // --- Helper for Individual Moments ---
+    function getMomentBadge(val) {
+        if (val === 'HW') return '<span class="badge bg-success badge-moment">HW</span>';
+        if (val === 'HR') return '<span class="badge bg-info badge-moment">HR</span>';
+        if (val === 'None') return '<span class="badge bg-danger badge-moment">X</span>';
+        if (val === 'Glove') return '<span class="badge bg-warning text-dark badge-moment">G</span>';
+        return '<span class="text-muted">-</span>';
+    }
+
+    function renderIndividualTable(data) {
+        const body = document.getElementById('individualTableBody');
+        body.innerHTML = '';
+        data.forEach((d, idx) => {
+            const score = d.m ? d.m.filter(v => v === 'HW' || v === 'HR').length : 0;
+            const pct = ((score / 5) * 100).toFixed(0);
+            body.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${d.obsDate ? d.obsDate.substring(0, 10) : '-'}</td>
+                    <td class="text-start">${d.dept || '-'}</td>
+                    <td>${d.role || '-'}</td>
+                    <td>${getMomentBadge(d.m[0])}</td>
+                    <td>${getMomentBadge(d.m[1])}</td>
+                    <td>${getMomentBadge(d.m[2])}</td>
+                    <td>${getMomentBadge(d.m[3])}</td>
+                    <td>${getMomentBadge(d.m[4])}</td>
+                    <td class="fw-bold fs-6">${score}</td>
+                    <td class="${getPercentColor(pct)}">${pct}%</td>
+                </tr>`;
+        });
     }
 
     // --- Chart Functions ---
