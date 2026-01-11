@@ -85,32 +85,6 @@
             <div class="col-md-6"><div class="card p-3"><h5 class="section-title">แยกตามวิชาชีพ (%)</h5><table class="table table-bordered table-sm text-center"><thead class="table-light"><tr><th>วิชาชีพ</th><th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th></tr></thead><tbody id="roleTableBody"></tbody></table></div></div>
         </div>
 
-<div class="card p-3 mt-3">
-    <h5 class="section-title text-primary">
-        สรุป 5 Moments แบบ Opportunity-based แยกตามแผนก (%)
-    </h5>
-    <div class="table-responsive">
-        <table class="table table-bordered table-sm text-center align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th rowspan="2">แผนก</th>
-                    <th colspan="5">ก่อนสัมผัสผู้ป่วย</th>
-                    <th colspan="5">ก่อนทำหัตถการปลอดเชื้อ</th>
-                    <th colspan="5">หลังสัมผัสสารคัดหลั่ง</th>
-                    <th colspan="5">หลังสัมผัสผู้ป่วย</th>
-                    <th colspan="5">หลังสัมผัสสิ่งแวดล้อม</th>
-                </tr>
-                <tr>
-                    <!-- ซ้ำ HW HR None Glove Total -->
-                    ${Array(5).fill('<th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th><th>รวม</th>').join('')}
-                </tr>
-            </thead>
-            <tbody id="deptMomentOppBody"></tbody>
-        </table>
-    </div>
-</div>
-
-        
         <div class="card p-3">
             <h5 class="section-title">ความพร้อมใช้อุปกรณ์และสรุปกลุ่มน้ำยาแยกตามแผนก (%)</h5>
             <div class="row g-3">
@@ -243,7 +217,6 @@
         drawEquipDeptChart(data);
         renderTables(data, n);
         renderEquipTable(data);
-        renderDeptMomentOpportunity(data); 
     }
 
     // --- Chart Functions ---
@@ -350,46 +323,6 @@
         XLSX.utils.book_append_sheet(wb, ws, "HandHygiene_Data");
         XLSX.writeFile(wb, "IC_HandHygiene_Full_Report.xlsx");
     }
-function renderDeptMomentOpportunity(data) {
-    const body = document.getElementById('deptMomentOppBody');
-    body.innerHTML = '';
-
-    const depts = [...new Set(data.map(d => d.dept))];
-    const moments = 5;
-
-    depts.forEach(dept => {
-        const rows = data.filter(d => d.dept === dept);
-        let html = `<tr><td class="text-start fw-bold">${dept}</td>`;
-
-        for (let i = 0; i < moments; i++) {
-            let s = { HW: 0, HR: 0, None: 0, Glove: 0 };
-
-            rows.forEach(r => {
-                if (r.m && r.m[i]) {
-                    s[r.m[i]]++;
-                }
-            });
-
-            const total = s.HW + s.HR + s.None + s.Glove;
-
-            if (total === 0) {
-                html += `<td colspan="5" class="text-muted">-</td>`;
-            } else {
-                const pct = v => ((v / total) * 100).toFixed(1);
-                html += `
-                    <td>${pct(s.HW)}%</td>
-                    <td>${pct(s.HR)}%</td>
-                    <td>${pct(s.None)}%</td>
-                    <td>${pct(s.Glove)}%</td>
-                    <td class="fw-bold text-success">100%</td>
-                `;
-            }
-        }
-        html += `</tr>`;
-        body.innerHTML += html;
-    });
-}
-    
 </script>
 </body>
 </html>
