@@ -3,149 +3,1198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report: IC Hand Hygiene Audit - โรงพยาบาลพุนพิน</title>
+    <title>IC Hand Hygiene Audit - โรงพยาบาลพุนพิน</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Google Fonts - Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Elements -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ChartJS & XLSX Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; color: #333; }
-        .header-banner { background: linear-gradient(135deg, #1d976c, #93f9b9); color: white; padding: 15px; border-radius: 0 0 20px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .card { border-radius: 12px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 10px; }
-        .section-title { border-left: 5px solid #1d976c; padding-left: 12px; margin-bottom: 15px; color: #1d976c; font-weight: bold; font-size: 1.1rem; }
-        .dash-card { background: white; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #eee; height: 100%; }
-        .dash-title { font-size: 1.1rem; color: #444; margin-bottom: 2px; font-weight: 700; }
-        .dash-value { font-size: 1.4rem; font-weight: 800; display: block; line-height: 1.2; }
-        .dash-fraction { font-size: 0.85rem; font-weight: 400; color: #888; display: block; }
-        .chart-container { position: relative; height: 200px; width: 100%; }
-        h6.chart-label { font-size: 0.9rem; font-weight: bold; margin-bottom: 8px; color: #555; height: 2.4em; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .table { font-size: 0.82rem; }
-        @media print { .no-print { display: none !important; } .card { box-shadow: none; border: 1px solid #ddd; } }
+        :root {
+            --primary-gradient: linear-gradient(135deg, #16a085, #2ecc71);
+            --primary-color: #16a085;
+            --secondary-color: #2ecc71;
+            --dark-blue: #2c3e50;
+            --light-bg: #f0f2f5;
+            --pink-accent: #d81b60;
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: var(--light-bg); 
+            color: #2c3e50; 
+            min-height: 100vh;
+        }
+
+        .header-banner { 
+            background: var(--primary-gradient); 
+            color: white; 
+            padding: 30px 20px; 
+            border-radius: 0 0 30px 30px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+        }
+
+        /* Nav Tabs design */
+        .nav-custom {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: -20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .nav-custom .nav-link {
+            background-color: white;
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 30px;
+            padding: 12px 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .nav-custom .nav-link.active {
+            background-color: var(--pink-accent);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3);
+        }
+        .nav-custom .nav-link:hover:not(.active) {
+            transform: translateY(-2px);
+            background-color: #f8f9fa;
+        }
+
+        /* Form Controls Premium Styling */
+        .form-section-title {
+            font-size: 1.15rem;
+            color: var(--primary-color);
+            border-bottom: 2px dashed #eee;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+
+        .card { 
+            border-radius: 20px; 
+            border: none; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 25px; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+        }
+        
+        .section-title { 
+            border-left: 8px solid var(--primary-color); 
+            padding-left: 15px; 
+            margin-bottom: 25px; 
+            color: var(--dark-blue); 
+            font-weight: bold; 
+            font-size: 1.25rem; 
+        }
+        
+        /* Dashboard Cards */
+        .dash-card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 5px solid var(--primary-color); 
+            height: 100%; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .dash-title { 
+            font-size: 0.85rem; 
+            color: #7f8c8d; 
+            margin-bottom: 8px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+        }
+        .dash-value { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            display: block; 
+            line-height: 1; 
+            margin-bottom: 5px; 
+        }
+        .dash-fraction { 
+            font-size: 0.9rem; 
+            color: #bdc3c7; 
+            font-weight: 400; 
+        }
+
+        /* Table Aesthetics */
+        .table { 
+            font-size: 0.85rem; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+        }
+        .table thead th { 
+            background-color: var(--dark-blue); 
+            color: white; 
+            border: none; 
+            padding: 12px 8px; 
+            font-weight: 500; 
+        }
+        .table-hover tbody tr:hover { 
+            background-color: #f1f8e9 !important; 
+        }
+        
+        .bg-label { 
+            background-color: #f8f9fa !important; 
+            font-weight: bold; 
+            position: sticky; 
+            left: 0; 
+            z-index: 10; 
+            border-right: 2px solid #dee2e6 !important; 
+            color: var(--dark-blue); 
+        }
+        .cell-pct { 
+            font-weight: 800; 
+            display: block; 
+            font-size: 0.9rem; 
+        }
+        .cell-frac { 
+            font-size: 0.7rem; 
+            color: #95a5a6; 
+            display: block; 
+        }
+        
+        /* Specific Table Colors */
+        .head-m { background-color: #34495e !important; border-right: 1px solid #455a64 !important; }
+        .head-comp { background-color: #27ae60 !important; color: white !important; }
+        .table-primary { background-color: #e3f2fd !important; color: #0d47a1 !important; }
+        .table-success { background-color: #e8f5e9 !important; color: #1b5e20 !important; }
+
+        /* Status Colors */
+        .text-hundred { color: #e74c3c !important; font-weight: 900; text-shadow: 0px 0px 1px rgba(0,0,0,0.1); } 
+        .text-success-custom { color: #27ae60 !important; font-weight: 700; } 
+        
+        .chart-container { position: relative; width: 100%; }
+        .chart-label { font-weight: bold; color: #34495e; margin-bottom: 15px; font-size: 1rem; }
+
+        /* Setup Interactive Radio/Check buttons */
+        .radio-group-box { 
+            background: #fdfdfd; 
+            padding: 18px; 
+            border-radius: 15px; 
+            border: 1px solid #e0e6ed; 
+            height: 100%; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .other-input { 
+            display: none; 
+            margin-top: 10px; 
+            border-color: var(--primary-color); 
+        }
+        .btn-check:checked + .btn-outline-primary { background-color: #0d6efd; color: white; }
+        .btn-check:checked + .btn-outline-info { background-color: #0dcaf0; color: white; }
+        .btn-check:checked + .btn-outline-danger { background-color: #dc3545; color: white; }
+        .btn-check:checked + .btn-outline-secondary { background-color: #6c757d; color: white; }
+
+        /* Custom Notification Toast / Modal */
+        #custom-alert-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1050;
+            justify-content: center;
+            align-items: center;
+        }
+        .custom-alert-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Sync Status indicator */
+        .sync-status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* Settings CSS & Dynamic Buttons */
+        .btn-pink {
+            background-color: var(--pink-accent);
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .btn-pink:hover {
+            background-color: #b0124a;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .sync-alert-box {
+            background-color: #e8f8f5;
+            border: 1px solid #a3e4d7;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        /* Badge design enhancements */
+        .badge-pending {
+            background-color: #fff9e6;
+            color: #d4a373;
+            border: 1px solid #ffe8cc;
+        }
+        .badge-synced {
+            background-color: #eafaf1;
+            color: #2ecc71;
+            border: 1px solid #d4efdf;
+        }
+
+        /* Screen Printing configurations */
+        @media print { 
+            .no-print { display: none !important; } 
+            .card { box-shadow: none; border: 1px solid #eee; margin-bottom: 10px; }
+            body { background-color: white; }
+            .container-fluid { padding: 0 !important; }
+        }
     </style>
 </head>
 <body>
 
-<div class="header-banner text-center mb-3 no-print">
-    <h4 class="fw-bold mb-0"><i class="fas fa-chart-line"></i> รายงานผล IC Hand Hygiene Audit โรงพยาบาลพุนพิน</h4>
+<!-- Header Banner -->
+<div class="header-banner text-center mb-4 no-print">
+    <h2 class="fw-bold mb-1"><i class="fas fa-hand-holding-medical"></i> IC Hand Hygiene Audit System</h2>
+    <p class="mb-1 opacity-75">โรงพยาบาลพุนพิน | Phunphin Hospital Hand Hygiene Tool</p>
+    <div id="connectionStatus" class="sync-status mt-2 text-white">
+        <span class="pulse-dot bg-warning" id="statusDot"></span>
+        <span id="statusText">กำลังดึงข้อมูลล่าสุดจากคลาวด์...</span>
+    </div>
 </div>
 
-<div class="container-fluid px-3">
-    <div class="card p-2 no-print bg-light border mb-3">
-        <div class="row align-items-end g-2 justify-content-center">
-            <div class="col-md-3">
-                <label class="form-label fw-bold small mb-1">รูปแบบการแสดงรายงาน</label>
-                <select class="form-select form-select-sm" id="filterType" onchange="toggleFilterInputs()">
-                    <option value="all">1. ข้อมูลทั้งหมด</option>
-                    <option value="month">2. รายเดือน (ระบุเดือน/ปี)</option>
-                    <option value="year">3. รายปี (ระบุปี)</option>
-                    <option value="range">4. กำหนดช่วงวันที่ (เริ่ม - สิ้นสุด)</option>
-                </select>
+<!-- Custom Nav Tabs for Switching View (Integrated History & Sync matching mock-up style) -->
+<div class="container-fluid px-lg-5 no-print">
+    <div class="nav-custom">
+        <button class="nav-link active" id="tabFormBtn" onclick="switchView('form')">
+            <i class="fas fa-edit me-2"></i> แบบประเมิน
+        </button>
+        <button class="nav-link" id="tabHistoryBtn" onclick="switchView('history')">
+            <i class="fas fa-history me-2"></i> ประวัติ & การซิงค์
+        </button>
+        <button class="nav-link" id="tabReportBtn" onclick="switchView('report')">
+            <i class="fas fa-chart-line me-2"></i> สถิติ & สรุปผล
+        </button>
+        <button class="nav-link" id="tabSettingsBtn" onclick="switchView('settings')">
+            <i class="fas fa-cog me-2"></i> ตั้งค่าระบบ
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5">
+    
+    <!-- ==================== SECTION 1: AUDIT FORM ==================== -->
+    <div id="sectionForm" class="tab-content-view">
+        <div class="card p-4">
+            <h5 class="section-title"><i class="fas fa-clipboard-check"></i> บันทึกผลการสังเกตการณ์ใหม่</h5>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-4 col-lg-3">
+                    <label class="form-label fw-bold text-muted small">วันที่สังเกต</label>
+                    <input type="date" id="obsDate" class="form-control form-control-lg border-primary-subtle">
+                </div>
             </div>
-            <div id="monthFilterGroup" class="col-md-2" style="display:none;"><label class="small mb-1">เลือกเดือน</label><input type="month" id="filterMonth" class="form-control form-control-sm"></div>
-            <div id="yearFilterGroup" class="col-md-2" style="display:none;"><label class="small mb-1">ระบุปี (ค.ศ.)</label><input type="number" id="filterYear" class="form-control form-control-sm" placeholder="2026"></div>
-            <div id="rangeFilterGroupStart" class="col-md-2" style="display:none;"><label class="small mb-1">จากวันที่</label><input type="date" id="filterStart" class="form-control form-control-sm"></div>
-            <div id="rangeFilterGroupEnd" class="col-md-2" style="display:none;"><label class="small mb-1">ถึงวันที่</label><input type="date" id="filterEnd" class="form-control form-control-sm"></div>
-            <div class="col-md-2">
-                <button class="btn btn-primary btn-sm w-100" onclick="updateReports()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+            
+            <div class="row g-4">
+                <!-- Department Selection -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-primary"><i class="fas fa-hospital-user me-2"></i>1. แผนก</label>
+                    <div class="radio-group-box">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="deptRadio" value="OPD" id="d_opd" onclick="toggleOther('deptOther', false)">
+                            <label class="form-check-label" for="d_opd">OPD</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="deptRadio" value="IPD" id="d_ipd" onclick="toggleOther('deptOther', false)">
+                            <label class="form-check-label" for="d_ipd">IPD</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="deptRadio" value="LR" id="d_lr" onclick="toggleOther('deptOther', false)">
+                            <label class="form-check-label" for="d_lr">LR</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="deptRadio" value="ER" id="d_er" onclick="toggleOther('deptOther', false)">
+                            <label class="form-check-label" for="d_er">ER</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="deptRadio" value="อื่นๆ" id="d_other" onclick="toggleOther('deptOther', true)">
+                            <label class="form-check-label" for="d_other">อื่นๆ</label>
+                        </div>
+                        <input type="text" id="deptOther" class="form-control form-control-sm other-input" placeholder="ระบุชื่อแผนก...">
+                    </div>
+                </div>
+
+                <!-- Professional Role Selection -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold text-primary"><i class="fas fa-user-md me-2"></i>2. วิชาชีพ</label>
+                    <div class="radio-group-box">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="roleRadio" value="แพทย์" id="r_dr" onclick="toggleOther('roleOther', false)">
+                            <label class="form-check-label" for="r_dr">แพทย์</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="roleRadio" value="พยาบาล" id="r_ns" onclick="toggleOther('roleOther', false)">
+                            <label class="form-check-label" for="r_ns">พยาบาล</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="roleRadio" value="ผู้ช่วยเหลือคนไข้" id="r_na" onclick="toggleOther('roleOther', false)">
+                            <label class="form-check-label" for="r_na">ผู้ช่วยเหลือคนไข้</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="roleRadio" value="นักศึกษาพยาบาล" id="r_st" onclick="toggleOther('roleOther', false)">
+                            <label class="form-check-label" for="r_st">นักศึกษาพยาบาล</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="roleRadio" value="อื่นๆ" id="r_other" onclick="toggleOther('roleOther', true)">
+                            <label class="form-check-label" for="r_other">อื่นๆ</label>
+                        </div>
+                        <input type="text" id="roleOther" class="form-control form-control-sm other-input" placeholder="ระบุวิชาชีพ...">
+                    </div>
+                </div>
+
+                <!-- Equipment Readiness Checkbox Group -->
+                <div class="col-md-6 border-start ps-4">
+                    <label class="form-label fw-bold text-warning"><i class="fas fa-pump-medical me-2"></i>3. ความพร้อมอุปกรณ์สนับสนุนการล้างมือ</label>
+                    <div class="row bg-light p-3 rounded-3 g-2 h-100">
+                        <div class="col-sm-6">
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e0"><label class="small ms-2 mt-1" for="e0">อ่างล้างมือ</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e1"><label class="small ms-2 mt-1" for="e1">สบู่เหลว</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e2"><label class="small ms-2 mt-1" for="e2">4% Chlorhexidine</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e3"><label class="small ms-2 mt-1" for="e3">Alcohol hand rub</label></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e4"><label class="small ms-2 mt-1" for="e4">กระดาษเช็ดมือ</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e5"><label class="small ms-2 mt-1" for="e5">โปสเตอร์สอนล้างมือ</label></div>
+                            <div class="form-check mb-3"><input class="form-check-input equip fs-5" type="checkbox" id="e6"><label class="small ms-2 mt-1" for="e6">ถังขยะทิ้งกระดาษเช็ดมือ</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 Moments Observation Input -->
+            <div class="mt-5 border-top pt-4">
+                <h6 class="fw-bold mb-3 text-success"><i class="fas fa-hands-wash me-2"></i>4. การปฏิบัติ 5 Moments (โอกาสในการล้างมือ)</h6>
+                <div id="momentInputList" class="row g-3"></div>
+            </div>
+
+            <!-- Form Action buttons -->
+            <div class="text-end mt-5 border-top pt-4">
+                <button class="btn btn-light border btn-lg px-4 me-2 rounded-pill" onclick="clearForm()">ล้างฟอร์ม</button>
+                <button class="btn btn-success btn-lg px-5 shadow rounded-pill" id="btnSave" onclick="saveData()">
+                    <i class="fas fa-cloud-upload-alt me-2"></i> ส่งข้อมูลไประบบ
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row g-2 mb-3">
-        <div class="col-md-3"><div class="dash-card"><div class="dash-title">HW Overall</div><div class="dash-value text-primary" id="hw_val">0%</div><div class="dash-fraction" id="hw_frac">(0/0)</div></div></div>
-        <div class="col-md-3"><div class="dash-card"><div class="dash-title">HR Overall</div><div class="dash-value text-info" id="hr_val">0%</div><div class="dash-fraction" id="hr_frac">(0/0)</div></div></div>
-        <div class="col-md-3"><div class="dash-card"><div class="dash-title">Compliance Rate(HW+HR)</div><div class="dash-value text-success" id="comp_val">0%</div><div class="dash-fraction" id="comp_frac">(0/0)</div></div></div>
-        <div class="col-md-3"><div class="dash-card"><div class="dash-title">ความพร้อมอุปกรณ์รวม</div><div class="dash-value text-warning" id="equip_val">0%</div><div class="dash-fraction" id="equip_frac">(0/0)</div></div></div>
-    </div>
-
-    <div class="row g-2 mb-3">
-        <div class="col-md-4"><div class="card p-2 h-100"><h6 class="chart-label">สัดส่วนวิธีปฏิบัติภาพรวม</h6><div class="chart-container"><canvas id="pieChart"></canvas></div></div></div>
-        <div class="col-md-4"><div class="card p-2 h-100"><h6 class="chart-label">ความร่วมมือแยกตาม 5 Moments (HR+HW)(%)</h6><div class="chart-container"><canvas id="momentChart"></canvas></div></div></div>
-        <div class="col-md-4"><div class="card p-2 h-100"><h6 class="chart-label">แนวโน้มความร่วมมือรายเดือน(HR+HW)</h6><div class="chart-container"><canvas id="trendChart"></canvas></div></div></div>
-        <div class="col-md-4"><div class="card p-2 h-100"><h6 class="chart-label">Compliance Rate รายแผนก(HR+HW)</h6><div class="chart-container"><canvas id="deptChart"></canvas></div></div></div>
-        <div class="col-md-8"><div class="card p-2 h-100"><h6 class="chart-label text-warning"><i class="fas fa-tools me-2"></i>ความพร้อมใช้อุปกรณ์แยกตามแผนก (%)</h6><div class="chart-container"><canvas id="equipDeptChart"></canvas></div></div></div>
-    </div>
-
-    <div class="text-end mb-4 no-print">
-        <button class="btn btn-success btn-sm me-2" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Export Excel (ข้อมูลพร้อมสรุป)</button>
-        <button class="btn btn-info btn-sm text-white" onclick="window.print()"><i class="fas fa-file-pdf"></i> พิมพ์ PDF</button>
-    </div>
-
-    <div id="reportArea">
-        <div class="card p-3">
-            <h5 class="section-title">สรุป 5 Moments สำหรับการล้างมือ</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm text-center align-middle"><thead class="table-light"><tr><th class="text-start">Moment</th><th>HW (%)</th><th>HR (%)</th><th>ไม่ล้าง (%)</th><th>ถุงมือ (%)</th></tr></thead><tbody id="momentTableBody"></tbody></table>
+    <!-- ==================== SECTION 2: HISTORY & SYNC ==================== -->
+    <div id="sectionHistory" class="tab-content-view" style="display: none;">
+        <!-- KPI Cards Grid Matching Uploaded Mockup layout -->
+        <div class="row g-4 mb-4 align-items-stretch">
+            <div class="col-md-4">
+                <div class="dash-card d-flex align-items-center justify-content-between p-4" style="border-bottom-color: #f39c12;">
+                    <div class="d-flex align-items-center gap-3 text-start">
+                        <div class="bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; background: #fffdf0;">
+                            <i class="fas fa-exclamation-triangle fs-3"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted fw-bold mb-1">รอการส่งขึ้น Google Sheets</div>
+                            <div class="fs-2 fw-extrabold text-warning" id="history_pending_count">0 รายการ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dash-card d-flex align-items-center justify-content-between p-4" style="border-bottom-color: #2ecc71;">
+                    <div class="d-flex align-items-center gap-3 text-start">
+                        <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 55px; height: 55px; background: #eafaf1;">
+                            <i class="fas fa-check-double fs-3"></i>
+                        </div>
+                        <div>
+                            <div class="small text-muted fw-bold mb-1">ซิงค์สำเร็จแล้ว</div>
+                            <div class="fs-2 fw-extrabold text-success" id="history_synced_count">0 รายการ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-pink w-100 h-100 rounded-3 shadow d-flex align-items-center justify-content-center gap-3 fw-bold fs-5 py-3" onclick="syncAllPending()">
+                    <i class="fas fa-sync-alt" id="syncAllIcon"></i> ซิงค์ขึ้น Google Sheets ทั้งหมด
+                </button>
             </div>
         </div>
 
-        <div class="card p-3">
-            <h5 class="section-title">สัดส่วนวิธีปฏิบัติแยกตาม Moment (%) (เทียบจากโอกาสทั้งหมดในทุก Moment)</h5>
+        <!-- Local Storage Records Database Panel -->
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-database me-2"></i>รายการประเมินทั้งหมดที่บันทึกไว้ในเครื่องนี้</h5>
+                <button class="btn btn-link text-danger text-decoration-none fw-bold p-0 d-flex align-items-center gap-1" onclick="confirmClearAllHistory()">
+                    <i class="fas fa-trash-alt"></i> ล้างประวัติทั้งหมด
+                </button>
+            </div>
+            
             <div class="table-responsive">
-                <table class="table table-bordered table-sm text-center">
+                <table class="table table-hover text-center align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-start">Moment (ลำดับ)</th>
-                            <th>HW</th>
-                            <th>HR</th>
-                            <th>ไม่ล้าง</th>
-                            <th>ถุงมือ</th>
+                            <th class="text-start ps-3" style="width: 150px;">วันที่ประเมิน</th>
+                            <th>ข้อมูลผู้รับการประเมิน</th>
+                            <th>ผลลัพธ์การประเมิน (5 Moments)</th>
+                            <th>ความพร้อมอุปกรณ์</th>
+                            <th>คะแนน / Compliance</th>
+                            <th>การซิงค์ข้อมูล</th>
+                            <th style="width: 100px;">การจัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="momentDetailTableBody"></tbody>
+                    <tbody id="historyTableBody">
+                        <!-- Filled Dynamically -->
+                    </tbody>
                 </table>
             </div>
-            <p class="small text-muted mt-1">* เปอร์เซ็นต์ในตารางนี้คำนวณจากโอกาสทั้งหมด (Total Opportunities = จำนวนเคส × 5)</p>
         </div>
+    </div>
 
-        <div class="row g-2">
-            <div class="col-md-6"><div class="card p-3"><h5 class="section-title">แยกตามแผนก (%)</h5><table class="table table-bordered table-sm text-center"><thead class="table-light"><tr><th>แผนก</th><th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th></tr></thead><tbody id="deptTableBody"></tbody></table></div></div>
-            <div class="col-md-6"><div class="card p-3"><h5 class="section-title">แยกตามวิชาชีพ (%)</h5><table class="table table-bordered table-sm text-center"><thead class="table-light"><tr><th>วิชาชีพ</th><th>HW</th><th>HR</th><th>ไม่ล้าง</th><th>ถุงมือ</th></tr></thead><tbody id="roleTableBody"></tbody></table></div></div>
-        </div>
 
-        <div class="card p-3">
-            <h5 class="section-title">ความพร้อมใช้อุปกรณ์และสรุปกลุ่มน้ำยาแยกตามแผนก (%)</h5>
-            <div class="row g-3">
-                <div class="col-lg-9">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm text-center align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>แผนก</th><th>อ่างล้างมือ</th><th>สบู่เหลว</th><th>4% Chlorhexidine</th><th>Alcohol hand rub</th><th>กระดาษเช็ดมือ</th><th>โปสเตอร์แสดงวิธีการล้างมือ</th><th>ถังขยะใส่กระดาษเช็ดมือ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="equipTableBody"></tbody>
-                        </table>
-                    </div>
+    <!-- ==================== SECTION 3: DASHBOARD REPORT ==================== -->
+    <div id="sectionReport" class="tab-content-view" style="display: none;">
+        
+        <!-- Controls & Filtering Box -->
+        <div class="card p-4 border-0 shadow-sm no-print">
+            <div class="row align-items-end g-3 justify-content-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold small text-muted"><i class="fas fa-filter"></i> รูปแบบการแสดงรายงาน</label>
+                    <select class="form-select border-success-subtle" id="filterType" onchange="toggleFilterInputs()">
+                        <option value="all">1. ข้อมูลทั้งหมด</option>
+                        <option value="month">2. รายเดือน</option>
+                        <option value="year">3. รายปี</option>
+                        <option value="range">4. กำหนดช่วงวันที่</option>
+                    </select>
                 </div>
-                <div class="col-lg-3">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm text-center align-middle">
-                            <thead class="table-light">
-                                <tr class="table-primary">
-                                    <th>แผนก</th>
-                                    <th title="สบู่เหลว หรือ 4%CHG หรือ Alcohol อย่างใดอย่างหนึ่ง">สรุปกลุ่มน้ำยา*</th>
-                                </tr>
-                            </thead>
-                            <tbody id="equipSummaryTableBody"></tbody>
-                        </table>
-                    </div>
-                    <p style="font-size: 0.7rem;" class="text-muted">* สรุปกลุ่มน้ำยา: คำนวณจากมี สบู่เหลว หรือ 4%CHG หรือ Alcohol อย่างใดอย่างหนึ่งพร้อม</p>
+                <div id="monthFilterGroup" class="col-md-2" style="display:none;"><label class="small text-muted">เลือกเดือน</label><input type="month" id="filterMonth" class="form-control"></div>
+                <div id="yearFilterGroup" class="col-md-2" style="display:none;"><label class="small text-muted">ระบุปี (ค.ศ.)</label><input type="number" id="filterYear" class="form-control" placeholder="2026"></div>
+                <div id="rangeFilterGroupStart" class="col-md-2" style="display:none;"><label class="small text-muted">จากวันที่</label><input type="date" id="filterStart" class="form-control"></div>
+                <div id="rangeFilterGroupEnd" class="col-md-2" style="display:none;"><label class="small text-muted">ถึงวันที่</label><input type="date" id="filterEnd" class="form-control"></div>
+                <div class="col-md-2">
+                    <button class="btn btn-success w-100 fw-bold py-2 shadow-sm rounded-pill" onclick="updateReports()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100 fw-bold py-2 shadow-sm rounded-pill" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Export Excel</button>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-danger w-100 fw-bold py-2 shadow-sm rounded-pill" onclick="window.print()"><i class="fas fa-file-pdf"></i> พิมพ์ PDF</button>
                 </div>
             </div>
+        </div>
+
+        <!-- Dashboard Stat Cards KPIs -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3"><div class="dash-card"><div class="dash-title">สัดส่วนทำความสะอาดมือด้วยน้ำสบู่</div><div class="dash-value text-primary" id="hw_val">0%</div><div class="dash-fraction" id="hw_frac">(0/0)</div></div></div>
+            <div class="col-md-3"><div class="dash-card"><div class="dash-title">สัดส่วนทำความสะอาดมือด้วยHR</div><div class="dash-value text-info" id="hr_val">0%</div><div class="dash-fraction" id="hr_frac">(0/0)</div></div></div>
+            <div class="col-md-3"><div class="dash-card" style="border-bottom-color: #27ae60;"><div class="dash-title">อัตราการทำความสะอาดมือภาพรวม</div><div class="dash-value text-success" id="comp_val">0%</div><div class="dash-fraction" id="comp_frac">(0/0)</div></div></div>
+            <div class="col-md-3"><div class="dash-card" style="border-bottom-color: #f39c12;"><div class="dash-title">ภาพรวมความพร้อมอุปกรณ์</div><div class="dash-value text-warning" id="equip_val">0%</div><div class="dash-fraction" id="equip_frac">(0/0)</div></div></div>
+        </div>
+
+        <!-- Charts Dashboard Grid -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card p-4 h-100"><h6 class="chart-label"><i class="fas fa-chart-pie me-2"></i>สัดส่วนการทำความสะอาดมือ(ครั้ง)</h6><div class="chart-container" style="height: 300px;"><canvas id="pieChart"></canvas></div></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card p-4 h-100"><h6 class="chart-label"><i class="fas fa-chart-bar me-2"></i>อัตราทำความสะอาดมือแต่ละโอกาส 5 Moments (HR+HW)(%)</h6><div class="chart-container" style="height: 300px;"><canvas id="momentChart"></canvas></div></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card p-4 h-100"><h6 class="chart-label"><i class="fas fa-chart-line me-2"></i>แนวโน้มความร่วมมือล้างมือ(%HW+HR)รายเดือน</h6><div class="chart-container" style="height: 300px;"><canvas id="trendChart"></canvas></div></div>
+            </div>
+        </div>
+
+        <!-- Dynamic Group Charts -->
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6"><div class="card p-4 h-100"><h6 class="chart-label">%HR+HW ตามแผนกแยกราย Moment</h6><div style="height: 350px;"><canvas id="deptMomentChart"></canvas></div></div></div>
+            <div class="col-lg-6"><div class="card p-4 h-100"><h6 class="chart-label">%HR+HW ตามวิชาชีพแยกราย Moment</h6><div style="height: 350px;"><canvas id="roleMomentChart"></canvas></div></div></div>
+        </div>
+
+        <!-- Matrix Tables / Reporting Areas -->
+        <div id="reportArea">
+            <h5 class="section-title"><i class="fas fa-table me-2"></i>ข้อมูลสรุปผลการวิเคราะห์</h5>
+            
+            <!-- Table 1: Overall 5 Moments -->
+            <div class="card overflow-hidden shadow-sm">
+                <div class="bg-dark p-3"><h6 class="text-white mb-0 small">อัตราการทำความสะอาดมือแต่ละโอกาส แยกราย Moment</h6></div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-start" style="width: 250px;">Moment Description</th>
+                                <th class="head-comp">HW + HR (%)</th>
+                                <th>HW (%)</th>
+                                <th>HR (%)</th>
+                                <th>ไม่ล้างมือ</th>
+                                <th>สวมถุงมือ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="momentTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 2: Department Horizontal Matrix -->
+            <div class="card mt-4 overflow-hidden shadow-sm">
+                <div class="bg-dark p-3 d-flex justify-content-between align-items-center">
+                    <h6 class="text-white mb-0 small">อัตราทำความสะอาดมือแต่ละโอกาส แยกตาม Moments และแผนก</h6>
+                    <span class="badge bg-secondary">Matrix View</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle table-matrix table-hover mb-0" style="min-width:1500px;">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="align-middle bg-label">แผนก (Department)</th>
+                                <th colspan="5" class="head-m">M1: ก่อนสัมผัสผู้ป่วย</th>
+                                <th colspan="5" class="head-m">M2: ก่อนทำหัตถการปลอดเชื้อ</th>
+                                <th colspan="5" class="head-m">M3: หลังสัมผัสสารคัดหลั่งผู้ป่วย</th>
+                                <th colspan="5" class="head-m">M4: หลังสัมผัสผู้ป่วย</th>
+                                <th colspan="5" class="head-m">M5: หลังสัมผัสสิ่งรอบตัวผู้ป่วย</th>
+                            </tr>
+                            <tr>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 3: Profession Matrix -->
+            <div class="card mt-4 overflow-hidden shadow-sm">
+                <div class="bg-dark p-3"><h6 class="text-white mb-0 small">อัตราทำความสะอาดมือแต่ละโอกาส แยกตาม Moments และวิชาชีพ</h6></div>
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle table-matrix table-hover mb-0" style="min-width:1500px;">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="align-middle bg-label">วิชาชีพ (Profession)</th>
+                                <th colspan="5" class="head-m">M1</th><th colspan="5" class="head-m">M2</th><th colspan="5" class="head-m">M3</th><th colspan="5" class="head-m">M4</th><th colspan="5" class="head-m">M5</th>
+                            </tr>
+                            <tr>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                                <th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrixRoleTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 4: Equipment Readiness by Department -->
+            <div class="card mt-4 overflow-hidden shadow-sm">
+                <div class="bg-warning p-3"><h6 class="mb-0 small fw-bold"><i class="fas fa-tools me-2"></i>ความพร้อมใช้อุปกรณ์แยกตามแผนก (%)</h6></div>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start bg-label">แผนก</th>
+                                <th>อ่างล้างมือ</th><th>สบู่เหลว</th><th>4% Chlorhexidine</th><th>Alcohol hand rub</th>
+                                <th>กระดาษเช็ดมือ</th><th>โปสเตอร์แสดงวิธีการล้างมือ</th><th>ถังขยะใส่กระดาษเช็ดมือ</th>
+                                <th class="table-primary">ความพร้อมภาพรวม (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipDeptTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table 5 & 6: Department & Role Summaries Grid -->
+            <div class="row g-4 mt-2 mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100 overflow-hidden shadow-sm">
+                        <div class="p-3 bg-light border-bottom fw-bold">ภาพรวมการทำความสะอาดมือแยกตามแผนก</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center mb-0">
+                                <thead><tr><th>แผนก</th><th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th></tr></thead>
+                                <tbody id="deptTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 overflow-hidden shadow-sm">
+                        <div class="p-3 bg-light border-bottom fw-bold">ภาพรวมการทำความสะอาดมือแยกตามวิชาชีพ</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-center mb-0">
+                                <thead><tr><th>วิชาชีพ</th><th class="head-comp">HW+HR</th><th>HW</th><th>HR</th><th>ไม่ล้างมือ</th><th>สวมถุงมือ</th></tr></thead>
+                                <tbody id="roleTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==================== SECTION 4: SYSTEM CONFIGURATION ==================== -->
+    <div id="sectionSettings" class="tab-content-view" style="display: none;">
+        <div class="card p-4">
+            <h5 class="section-title"><i class="fas fa-cog me-2"></i>ตั้งค่าระบบ</h5>
+            
+            <div class="p-2 p-md-4 border rounded-3 bg-white shadow-sm">
+                <h6 class="fw-bold text-dark mb-4"><i class="fas fa-cloud-sun me-2"></i>ตั้งค่าการซิงค์ข้อมูล Google Sheets</h6>
+                
+                <!-- Main Target SpreadSheet UI Panel -->
+                <div class="sync-alert-box mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                        <span class="fw-bold text-dark"><i class="fas fa-database me-1"></i> สเปรดชีตเป้าหมายหลัก:</span>
+                        <span class="badge bg-success" id="syncBadge">SYNC ENABLED</span>
+                    </div>
+                    
+                    <!-- Spreadsheet clickable anchor link -->
+                    <a id="sheetLinkDisplay" href="https://docs.google.com/spreadsheets/d/1y6WfS1W23gV8f_v7T6n3b_w073W8N08_6888Y0_Y888/edit" target="_blank" class="fw-bold text-decoration-none d-block my-3 fs-5" style="color: #16a085;">
+                        <i class="fas fa-external-link-alt me-2"></i>DATA Hand Hygiene Audit - Google ชีต (คลิกเพื่อเปิดดูสเปรดชีต)
+                    </a>
+                    
+                    <span class="small text-muted d-block"><i class="fas fa-info-circle me-1"></i> ข้อมูลจะถูกดึงและบันทึกลงในแท็บ <strong class="text-dark">"DATA"</strong> โดยอัตโนมัติ</span>
+                </div>
+
+                <!-- Input Apps Script API Link -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small">Google Apps Script Web App URL</label>
+                    <input type="text" id="inputScriptUrl" class="form-control form-control-lg border-primary-subtle" placeholder="วาง URL ของ Web App ที่ได้จาก Deploy Google Apps Script...">
+                    <span class="small text-muted mt-2 d-block">กรอก URL ของ Web App ที่ได้รับหลังจาก Deploy โค้ดในส่วนขยาย Google Apps Script เพื่อเปิดใช้งานฐานข้อมูลคลาวด์</span>
+                </div>
+
+                <!-- Action Buttons inside settings -->
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-pink px-4 py-2 rounded-pill fw-bold shadow-sm" onclick="saveSettings()">
+                        <i class="fas fa-save me-2"></i> บันทึกการตั้งค่า
+                    </button>
+                    <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold" onclick="testConnection()">
+                        <i class="fas fa-network-wired me-2"></i> ทดสอบการเชื่อมต่อ API
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Dialog Modal Element for Alerts (Extended for confirmation buttons) -->
+<div id="custom-alert-modal">
+    <div class="custom-alert-box">
+        <h4 id="alertTitle" class="fw-bold mb-3 text-dark">แจ้งเตือน</h4>
+        <p id="alertMessage" class="text-muted mb-4">ข้อความ</p>
+        <div class="d-flex justify-content-center gap-2" id="alertActionGroup">
+            <button class="btn btn-success px-4 rounded-pill" onclick="closeAlertModal()">ตกลง</button>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx58a1xS-6se0SXJ_pyfPsk7wIPZlz9I6OGcksrA3ohJ9hkHloZVTbdD9a27HpbGK8QbQ/exec"; 
+    // System script configurations (Fallback defaults)
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx58a1xS-6se0SXJ_pyfPsk7wIPZlz9I6OGcksrA3ohJ9hkHloZVTbdD9a27HpbGK8QbQ/exec";
+    const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1y6WfS1W23gV8f_v7T6n3b_w073W8N08_6888Y0_Y888/edit";
+
+    let activeScriptUrl = localStorage.getItem('hh_script_url') || DEFAULT_SCRIPT_URL;
+    let activeSheetUrl = localStorage.getItem('hh_sheet_url') || DEFAULT_SHEET_URL;
+    
+    // Persistent Local Database array
+    let localHistory = JSON.parse(localStorage.getItem('hh_local_history')) || [];
+    
+    const momentLabels = ["ก่อนสัมผัสผู้ป่วย", "ก่อนทำหัตถการปลอดเชื้อ", "หลังสัมผัสสารคัดหลั่งผู้ป่วย", "หลังสัมผัสผู้ป่วย", "หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
+    
     let database = [];
     let charts = {};
+    let currentFilteredData = [];
 
-    window.onload = fetchDataFromSheet;
-    function fetchDataFromSheet() { fetch(SCRIPT_URL).then(res => res.json()).then(data => { database = data; updateReports(); }); }
-    
+    window.onload = function() {
+        // Set dynamic settings initial UI fields
+        document.getElementById('inputScriptUrl').value = activeScriptUrl;
+        document.getElementById('sheetLinkDisplay').href = activeSheetUrl;
+
+        // Form setups
+        initFormElements();
+        // Render history table initial load
+        renderHistoryTable();
+        // Load Database
+        fetchDataFromSheet();
+    };
+
+    function switchView(viewName) {
+        document.querySelectorAll('.tab-content-view').forEach(view => view.style.display = 'none');
+        document.querySelectorAll('.nav-custom .nav-link').forEach(link => link.classList.remove('active'));
+        
+        if (viewName === 'form') {
+            document.getElementById('sectionForm').style.display = 'block';
+            document.getElementById('tabFormBtn').classList.add('active');
+        } else if (viewName === 'history') {
+            document.getElementById('sectionHistory').style.display = 'block';
+            document.getElementById('tabHistoryBtn').classList.add('active');
+            renderHistoryTable();
+        } else if (viewName === 'report') {
+            document.getElementById('sectionReport').style.display = 'block';
+            document.getElementById('tabReportBtn').classList.add('active');
+            updateReports();
+        } else if (viewName === 'settings') {
+            document.getElementById('sectionSettings').style.display = 'block';
+            document.getElementById('tabSettingsBtn').classList.add('active');
+        }
+    }
+
+    function initFormElements() {
+        // Populate Moments input grid
+        const mDiv = document.getElementById('momentInputList');
+        mDiv.innerHTML = '';
+        momentLabels.forEach((label, i) => {
+            mDiv.innerHTML += `
+            <div class="col-md-4">
+                <div class="p-3 border rounded-3 bg-white h-100 shadow-sm">
+                    <label class="small fw-bold d-block mb-3 text-dark">${i+1}. ${label}</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <input type="radio" class="btn-check" name="m${i}" id="m${i}hw" value="HW">
+                        <label class="btn btn-outline-primary btn-sm px-3" for="m${i}hw">HW</label>
+                        
+                        <input type="radio" class="btn-check" name="m${i}" id="m${i}hr" value="HR">
+                        <label class="btn btn-outline-info btn-sm px-3" for="m${i}hr">HR</label>
+                        
+                        <input type="radio" class="btn-check" name="m${i}" id="m${i}no" value="None">
+                        <label class="btn btn-outline-danger btn-sm px-2" for="m${i}no">ไม่ล้างมือ</label>
+                        
+                        <input type="radio" class="btn-check" name="m${i}" id="m${i}gl" value="Glove">
+                        <label class="btn btn-outline-secondary btn-sm px-2" for="m${i}gl">สวมถุงมือ</label>
+                    </div>
+                </div>
+            </div>`;
+        });
+        
+        // Auto initialize date defaults
+        const now = new Date();
+        document.getElementById('obsDate').value = now.toISOString().slice(0, 10);
+    }
+
+    function toggleOther(id, show) { 
+        document.getElementById(id).style.display = show ? "block" : "none"; 
+    }
+
+    // Modal Display Handler
+    function showCustomAlert(title, message, isSuccess = true) {
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertTitle').className = isSuccess ? "fw-bold mb-3 text-success" : "fw-bold mb-3 text-danger";
+        document.getElementById('alertMessage').innerText = message;
+        
+        // Reset default confirm buttons layout
+        document.getElementById('alertActionGroup').innerHTML = `
+            <button class="btn btn-success px-4 rounded-pill" onclick="closeAlertModal()">ตกลง</button>
+        `;
+        document.getElementById('custom-alert-modal').style.display = 'flex';
+    }
+
+    // Modal Confirmation Dialog Handler (No browser confirm alert dialogs)
+    function showCustomConfirm(title, message, onConfirm) {
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertTitle').className = "fw-bold mb-3 text-danger";
+        document.getElementById('alertMessage').innerText = message;
+        
+        document.getElementById('alertActionGroup').innerHTML = `
+            <button class="btn btn-light border px-4 rounded-pill me-2" onclick="closeAlertModal()">ยกเลิก</button>
+            <button class="btn btn-danger px-4 rounded-pill fw-bold" id="confirmActionBtn">ลบประวัติ</button>
+        `;
+        
+        document.getElementById('confirmActionBtn').onclick = function() {
+            onConfirm();
+            closeAlertModal();
+        };
+        
+        document.getElementById('custom-alert-modal').style.display = 'flex';
+    }
+
+    function closeAlertModal() {
+        document.getElementById('custom-alert-modal').style.display = 'none';
+    }
+
+    function updateSyncStatus(statusType, text) {
+        const dot = document.getElementById('statusDot');
+        const label = document.getElementById('statusText');
+        label.innerText = text;
+        if (statusType === 'success') {
+            dot.className = "pulse-dot bg-success";
+        } else if (statusType === 'error') {
+            dot.className = "pulse-dot bg-danger";
+        } else {
+            dot.className = "pulse-dot bg-warning";
+        }
+    }
+
+    // Save and Persist Configs
+    function saveSettings() {
+        const inputScript = document.getElementById('inputScriptUrl').value.trim();
+
+        if (!inputScript) {
+            return showCustomAlert("ผิดพลาด", "กรุณาระบุ Google Apps Script Web App URL", false);
+        }
+
+        localStorage.setItem('hh_script_url', inputScript);
+        activeScriptUrl = inputScript;
+
+        showCustomAlert("บันทึกการตั้งค่าสำเร็จ", "ระบบเชื่อมต่อบันทึกข้อมูลเรียบร้อยแล้ว ระบบกำลังดึงฐานข้อมูลใหม่...");
+        fetchDataFromSheet();
+    }
+
+    // Test API Route Connection via GET
+    function testConnection() {
+        const inputScript = document.getElementById('inputScriptUrl').value.trim();
+        if (!inputScript) {
+            return showCustomAlert("ผิดพลาด", "กรุณาระบุ URL ก่อนทำการทดสอบ", false);
+        }
+
+        updateSyncStatus('pending', 'กำลังทดสอบเชื่อมต่อ API...');
+        
+        fetch(inputScript)
+            .then(res => res.json())
+            .then(data => {
+                updateSyncStatus('success', 'เชื่อมต่อ API สำเร็จ!');
+                showCustomAlert("เชื่อมต่อสำเร็จ", "ระบบสามารถอ่านเขียนข้อมูลบน Google Sheets ได้ตามปกติ 🎉");
+            })
+            .catch(err => {
+                updateSyncStatus('error', 'การเชื่อมต่อ API ขัดข้อง');
+                showCustomAlert("การเชื่อมต่อขัดข้อง", "ไม่สามารถเรียกดูผลการเชื่อมต่อทดสอบได้ (โปรดตรวจสอบการตั้งค่า Deploy แบบสิทธิ์ Everyone ใน Google Apps Script ของคุณ)", false);
+            });
+    }
+
+    // Dynamic Cloud Data Fetching
+    function fetchDataFromSheet() {
+        updateSyncStatus('pending', 'กำลังดึงข้อมูลล่าสุดจากคลาวด์...');
+        fetch(activeScriptUrl)
+            .then(res => res.json())
+            .then(data => {
+                database = data.map(item => {
+                    let record = {...item};
+                    if (typeof record.m === 'string') {
+                        try { record.m = JSON.parse(record.m); } catch(e) { record.m = record.m.split(','); }
+                    }
+                    if (typeof record.equips === 'string') {
+                        try { record.equips = JSON.parse(record.equips); } catch(e) { record.equips = record.equips.split(',').map(Number); }
+                    }
+                    return record;
+                });
+                
+                updateSyncStatus('success', `พร้อมใช้งาน: โหลดแล้ว ${database.length} รายการ`);
+                if(document.getElementById('sectionReport').style.display === 'block') {
+                    updateReports();
+                }
+            })
+            .catch(err => {
+                updateSyncStatus('error', 'ระบบออฟไลน์ชั่วคราว ดึงข้อมูลไม่สำเร็จ');
+                console.error(err);
+            });
+    }
+
+    // Helper: Convert YYYY-MM-DD string to Thai format DD/MM/BBBB
+    function formatThaiDate(dateStr) {
+        if(!dateStr) return "-";
+        const parts = dateStr.split('-');
+        if(parts.length === 3) {
+            const y = parseInt(parts[0]);
+            const m = parts[1];
+            const d = parts[2];
+            return `${d}/${m}/${y + 543}`;
+        }
+        return dateStr;
+    }
+
+    // Populate local audits history list
+    function renderHistoryTable() {
+        const body = document.getElementById('historyTableBody');
+        body.innerHTML = '';
+        
+        // Update sync KPI counters
+        const pendingCount = localHistory.filter(r => !r.synced).length;
+        const syncedCount = localHistory.filter(r => r.synced).length;
+        
+        document.getElementById('history_pending_count').innerText = `${pendingCount} รายการ`;
+        document.getElementById('history_synced_count').innerText = `${syncedCount} รายการ`;
+
+        if (localHistory.length === 0) {
+            body.innerHTML = `<tr><td colspan="7" class="text-muted p-4">ไม่มีประวัติการประเมินถูกเก็บไว้ในเครื่องนี้</td></tr>`;
+            return;
+        }
+
+        // Sort by date/time descending
+        const sortedHistory = [...localHistory].sort((a, b) => {
+            const da = a.obsDate + 'T' + a.obsTime;
+            const db = b.obsDate + 'T' + b.obsTime;
+            return db.localeCompare(da);
+        });
+
+        sortedHistory.forEach(d => {
+            // Calculated Row compliance
+            const rowHW = d.m.filter(v => v === 'HW').length;
+            const rowHR = d.m.filter(v => v === 'HR').length;
+            const rowNone = d.m.filter(v => v === 'None').length;
+            const rowGlove = d.m.filter(v => v === 'Glove').length;
+            const rowTotalOpp = rowHW + rowHR + rowNone + rowGlove;
+            const rowComp = rowTotalOpp > 0 ? (((rowHW + rowHR) / rowTotalOpp) * 100).toFixed(0) : 0;
+            
+            // Equipment total readiness count
+            const rowEquipsReady = d.equips ? d.equips.reduce((acc, v) => acc + v, 0) : 0;
+            const rowEquipPct = ((rowEquipsReady / 7) * 100).toFixed(0);
+
+            // Moments dynamic badges creation
+            let momentsBadgesHtml = '<div class="d-flex justify-content-center gap-1">';
+            for(let i = 0; i < 5; i++) {
+                const val = d.m[i] || "";
+                let bgStyle = "background-color: #f1f2f6; color: #7f8c8d; border: 1px solid #dcdde1;";
+                let shortLabel = "-";
+                
+                if (val === 'HW') {
+                    bgStyle = "background-color: #0d6efd; color: white;";
+                    shortLabel = "HW";
+                } else if (val === 'HR') {
+                    bgStyle = "background-color: #0dcaf0; color: white;";
+                    shortLabel = "HR";
+                } else if (val === 'None') {
+                    bgStyle = "background-color: #dc3545; color: white;";
+                    shortLabel = "X";
+                } else if (val === 'Glove') {
+                    bgStyle = "background-color: #6c757d; color: white;";
+                    shortLabel = "G";
+                }
+                
+                momentsBadgesHtml += `<span class="rounded-circle d-flex align-items-center justify-content-center shadow-sm fw-bold" style="width: 28px; height: 28px; font-size: 0.65rem; ${bgStyle}" title="M${i+1}: ${momentLabels[i]} - ${val || 'ไม่ได้ระบุ'}">${shortLabel}</span>`;
+            }
+            momentsBadgesHtml += '</div>';
+
+            // Custom compliant background coloring
+            let compBadgeColor = "background-color: #fef9e7; color: #f39c12; border: 1px solid #fdebd0;";
+            if (rowComp >= 80) {
+                compBadgeColor = "background-color: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9;";
+            } else if (rowComp < 50) {
+                compBadgeColor = "background-color: #fdf2f2; color: #ec5858; border: 1px solid #fde8e8;";
+            }
+
+            const syncPill = d.synced 
+                ? `<span class="badge badge-synced px-3 py-2 rounded-pill"><i class="fas fa-check-circle me-1"></i> ซิงค์แล้ว</span>`
+                : `<span class="badge badge-pending px-3 py-2 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> รอส่งข้อมูล</span>`;
+
+            body.innerHTML += `
+                <tr>
+                    <td class="text-start ps-3 fw-bold">${formatThaiDate(d.obsDate)}<br><small class="text-muted fw-normal">${d.obsTime} น.</small></td>
+                    <td><strong class="text-dark">${d.dept}</strong><br><small class="text-muted">${d.role}</small></td>
+                    <td>${momentsBadgesHtml}</td>
+                    <td><span class="badge bg-light text-dark border border-secondary-subtle px-3 py-2 rounded-pill fw-bold">${rowEquipsReady}/7 ชิ้น (${rowEquipPct}%)</span></td>
+                    <td><span class="badge px-3 py-2 rounded-pill fw-bold" style="${compBadgeColor}; font-size: 0.85rem;">${rowComp}%</span></td>
+                    <td>${syncPill}</td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm rounded-circle p-2 border-0" onclick="deleteLocalRecord('${d.id}')" title="ลบข้อมูลเครื่องนี้">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Delete single local record from app
+    function deleteLocalRecord(id) {
+        showCustomConfirm("ต้องการลบประวัติประเมิน?", "คุณต้องการลบรายงานประวัติแผ่นงานแถวนี้ออกจากหน่วยความจำของเครื่องนี้ใช่หรือไม่?", function() {
+            localHistory = localHistory.filter(r => r.id !== id);
+            localStorage.setItem('hh_local_history', JSON.stringify(localHistory));
+            renderHistoryTable();
+            if(document.getElementById('sectionReport').style.display === 'block') {
+                updateReports();
+            }
+        });
+    }
+
+    // Confirm completely clearing out all local history
+    function confirmClearAllHistory() {
+        if(localHistory.length === 0) {
+            return showCustomAlert("ไม่มีประวัติ", "ไม่มีข้อมูลประวัติประเมินบันทึกค้างไว้ในอุปกรณ์นี้", false);
+        }
+        showCustomConfirm(
+            "ยืนยันการลบประวัติทั้งหมด", 
+            "คุณต้องการทำความสะอาดลบประวัติการประเมินทั้งหมดที่เก็บสะสมไว้ในเบราว์เซอร์เครื่องนี้หรือไม่? (การลบนี้จะไม่ส่งผลต่อข้อมูลที่บันทึกสำเร็จลงคลาวด์สเปรดชีตแล้ว)", 
+            function() {
+                localHistory = [];
+                localStorage.setItem('hh_local_history', JSON.stringify([]));
+                renderHistoryTable();
+                if(document.getElementById('sectionReport').style.display === 'block') {
+                    updateReports();
+                }
+            }
+        );
+    }
+
+    // Core record post action to Sheet Web App API
+    function uploadRecord(record) {
+        return fetch(activeScriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(record)
+        });
+    }
+
+    // Sequential batch pending sync
+    async function syncAllPending() {
+        const pending = localHistory.filter(r => !r.synced);
+        if (pending.length === 0) {
+            return showCustomAlert("ไม่มีข้อมูลค้างส่ง", "ข้อมูลการประเมินทั้งหมดของคุณในเครื่องได้รับการบันทึกขึ้นระบบคลาวด์ครบถ้วนแล้ว ✨");
+        }
+
+        const syncBtn = document.querySelector('[onclick="syncAllPending()"]');
+        const syncIcon = document.getElementById('syncAllIcon');
+        
+        syncBtn.disabled = true;
+        if(syncIcon) syncIcon.className = "fas fa-sync-alt fa-spin me-2";
+        syncBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> กำลังซิงค์คลาวด์ (${pending.length} รายการ)...`;
+        updateSyncStatus('pending', `กำลังทยอยส่งข้อมูลประเมินขึ้นระบบ (${pending.length} รายการ)...`);
+
+        let successCount = 0;
+        for (let i = 0; i < pending.length; i++) {
+            const rec = pending[i];
+            try {
+                await uploadRecord(rec);
+                // Mark locally as synced on success response
+                rec.synced = true;
+                successCount++;
+            } catch (err) {
+                console.error("Failed uploading item", rec.id, err);
+            }
+        }
+
+        // Apply back to storage
+        localStorage.setItem('hh_local_history', JSON.stringify(localHistory));
+
+        // Revert UI elements
+        syncBtn.disabled = false;
+        if(syncIcon) syncIcon.className = "fas fa-sync-alt me-2";
+        syncBtn.innerHTML = `<i class="fas fa-sync-alt me-2" id="syncAllIcon"></i> ซิงค์ขึ้น Google Sheets ทั้งหมด`;
+
+        if (successCount === pending.length) {
+            showCustomAlert("บันทึกเสร็จสมบูรณ์", `นำส่งข้อมูลขึ้นแท็บ DATA สำเร็จครบถ้วนแล้วทั้งสิ้น ${successCount} รายการ!`);
+            updateSyncStatus('success', `พร้อมใช้งาน: บันทึกข้อมูลคลาวด์สำเร็จแล้ว`);
+        } else {
+            showCustomAlert("ส่งข้อมูลไม่ครบ", `การเชื่อมต่อขัดข้อง: นำส่งสำเร็จ ${successCount} จาก ${pending.length} รายการ กรุณาลองทดสอบการเชื่อมต่อ API อีกครั้ง`, false);
+            updateSyncStatus('error', 'ซิงค์ข้อมูลบางส่วนล้มเหลว');
+        }
+
+        // Re-load Sheet data database to combine with local storage stats
+        fetchDataFromSheet();
+        renderHistoryTable();
+    }
+
+    // Clear Form inputs
+    function clearForm() { 
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false); 
+        document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false); 
+        const now = new Date();
+        document.getElementById('obsDate').value = now.toISOString().slice(0, 10);
+        toggleOther('deptOther', false);
+        toggleOther('roleOther', false);
+    }
+
+    // Save Form observation logic (Saves local database first, then pushes to API)
+    function saveData() {
+        const dDate = document.getElementById('obsDate').value;
+        
+        // Auto generate current system time (HH:MM) to remove observational burden from User
+        const now = new Date();
+        const dTime = now.toTimeString().slice(0, 5); 
+        
+        const dRadio = document.querySelector('input[name="deptRadio"]:checked');
+        const rRadio = document.querySelector('input[name="roleRadio"]:checked');
+        
+        if (!dDate || !dRadio || !rRadio) {
+            return showCustomAlert("กรอกข้อมูลไม่ครบถ้วน", "กรุณาระบุข้อมูล วันที่ แผนก และวิชาชีพให้ครบก่อนส่งบันทึก", false);
+        }
+        
+        let dVal = dRadio.value === "อื่นๆ" ? (document.getElementById('deptOther').value || "อื่นๆ") : dRadio.value;
+        let rVal = rRadio.value === "อื่นๆ" ? (document.getElementById('roleOther').value || "อื่นๆ") : rRadio.value;
+        
+        const moments = [0,1,2,3,4].map(i => {
+            const el = document.querySelector(`input[name="m${i}"]:checked`);
+            return el ? el.value : ""; 
+        });
+
+        // Set unique temporary record identification
+        const record = { 
+            id: "rec_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
+            obsDate: dDate, 
+            obsTime: dTime, 
+            dept: dVal, 
+            role: rVal, 
+            m: moments, 
+            equips: Array.from(document.querySelectorAll('.equip')).map(e => e.checked ? 1 : 0),
+            synced: false
+        };
+
+        const saveButton = document.getElementById('btnSave');
+        saveButton.disabled = true;
+        saveButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> กำลังส่งข้อมูล...`;
+        updateSyncStatus('pending', 'กำลังส่งข้อมูลบันทึกเข้าสู่อินเตอร์เน็ต...');
+
+        // Push to local storage first for total safety
+        localHistory.push(record);
+        localStorage.setItem('hh_local_history', JSON.stringify(localHistory));
+
+        // Submit to Cloud Web App API
+        uploadRecord(record)
+        .then(() => {
+            // Update sync flag state locally on immediate post success
+            record.synced = true;
+            localHistory = localHistory.map(r => r.id === record.id ? {...r, synced: true} : r);
+            localStorage.setItem('hh_local_history', JSON.stringify(localHistory));
+
+            showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว", "ข้อมูลประเมินของคุณถูกซิงค์ขึ้นสเปรดชีตเป้าหมายคลาวด์โดยตรงเรียบร้อยแล้ว");
+            
+            saveButton.disabled = false;
+            saveButton.innerHTML = `<i class="fas fa-cloud-upload-alt me-2"></i> ส่งข้อมูลไประบบ`;
+            updateSyncStatus('success', `ซิงค์สำเร็จ! โหลดแล้ว ${database.length} รายการ`);
+            clearForm();
+            renderHistoryTable();
+        })
+        .catch(err => {
+            // Leave flagged synced false, locally cached
+            showCustomAlert("บันทึกออฟไลน์สำเร็จ", "ไม่สามารถส่งหาเซิร์ฟเวอร์คลาวด์ได้ขณะนี้ ระบบทำการบันทึกข้อมูลแบบออฟไลน์ไว้ในเครื่องนี้ (คุณสามารถส่งซิงค์ทั้งหมดได้ในภายหลังจากเมนู 'ประวัติ & การซิงค์')", false);
+            
+            saveButton.disabled = false;
+            saveButton.innerHTML = `<i class="fas fa-cloud-upload-alt me-2"></i> ส่งข้อมูลไประบบ`;
+            updateSyncStatus('error', 'การส่งข้อมูลขัดข้อง (บันทึกค้างไว้ในเครื่องนี้)');
+            clearForm();
+            renderHistoryTable();
+        });
+    }
+
+    // Handle dashboard UI filter switches
     function toggleFilterInputs() {
         const type = document.getElementById('filterType').value;
         document.getElementById('monthFilterGroup').style.display = (type === 'month') ? 'block' : 'none';
@@ -154,208 +1203,279 @@
         document.getElementById('rangeFilterGroupEnd').style.display = (type === 'range') ? 'block' : 'none';
     }
 
+    // Core Filtering Mechanism (Merges Sheet data + local unsynced data dynamically)
     function updateReports() {
+        // Collect unsynced local rows
+        const unsyncedLocals = localHistory.filter(r => !r.synced);
+        
+        // Merge without duplicating remote IDs
+        const mergedDb = [...database];
+        unsyncedLocals.forEach(localRec => {
+            if(!mergedDb.some(item => item.id === localRec.id)) {
+                mergedDb.push(localRec);
+            }
+        });
+
         const type = document.getElementById('filterType').value;
-        let filtered = database;
+        let filtered = mergedDb;
+        
         if (type === 'month') {
             const val = document.getElementById('filterMonth').value;
-            if (val) filtered = database.filter(d => d.obsDate && d.obsDate.substring(0, 7) === val);
+            if (val) filtered = mergedDb.filter(d => d.obsDate && d.obsDate.substring(0, 7) === val);
         } else if (type === 'year') {
             const val = document.getElementById('filterYear').value;
-            if (val) filtered = database.filter(d => d.obsDate && d.obsDate.substring(0, 4) === val);
+            if (val) filtered = mergedDb.filter(d => d.obsDate && d.obsDate.substring(0, 4) === val);
         } else if (type === 'range') {
             const start = document.getElementById('filterStart').value;
             const end = document.getElementById('filterEnd').value;
-            if (start && end) filtered = database.filter(d => { const dD = d.obsDate.substring(0, 10); return dD >= start && dD <= end; });
+            if (start && end) filtered = mergedDb.filter(d => { const dD = d.obsDate.substring(0, 10); return dD >= start && dD <= end; });
         }
-
-        if (filtered.length === 0) {
-            alert("ไม่พบข้อมูลในช่วงที่เลือก");
-            resetDashboard();
-            return;
+        
+        if (filtered.length === 0) { 
+            showCustomAlert("ไม่พบข้อมูล", "ไม่พบรายการบันทึกในช่วงเวลาที่เลือก กรุณาลองปรับแต่งช่วงเวลาใหม่อีกครั้ง", false); 
+            resetDashboard(); 
+            return; 
         }
-
+        currentFilteredData = filtered;
         render(filtered);
     }
 
     function resetDashboard() {
-        ['hw_val', 'hw_frac', 'hr_val', 'hr_frac', 'comp_val', 'comp_frac', 'equip_val', 'equip_frac'].forEach(id => document.getElementById(id).innerText = (id.includes('val') ? '0%' : '(0/0)'));
-        ['momentTableBody', 'momentDetailTableBody', 'deptTableBody', 'roleTableBody', 'equipTableBody', 'equipSummaryTableBody'].forEach(id => {
-            document.getElementById(id).innerHTML = '';
-        });
-        for (let key in charts) {
-            if (charts[key]) {
-                charts[key].destroy();
-                charts[key] = null;
-            }
-        }
+        ['hw_val', 'hr_val', 'comp_val', 'equip_val'].forEach(id => document.getElementById(id).innerText = '0%');
+        ['matrixTableBody', 'matrixRoleTableBody', 'momentTableBody', 'deptTableBody', 'roleTableBody', 'equipDeptTableBody'].forEach(id => document.getElementById(id).innerHTML = '');
+        for (let key in charts) { if (charts[key]) { charts[key].destroy(); charts[key] = null; } }
     }
 
-    function getPercentColor(pct) {
-        let val = parseFloat(pct);
-        if (val === 0) return 'text-danger fw-bold'; 
-        if (val === 100) return 'text-success fw-bold';
-        return ''; 
-    }
-
+    // Master Render Engine (Exact Formulas from Requirements)
     function render(data) {
-        let n = data.length; 
-        let hw = 0, hr = 0, none = 0, glove = 0, eqTotal = 0;
-        let mStats = [0,0,0,0,0];
+        let hw = 0, hr = 0, none = 0, glove = 0, eqTotalRaw = 0;
+        let mStats = Array.from({ length: 5 }, () => ({ hw: 0, hr: 0, none: 0, glove: 0 }));
 
         data.forEach(d => {
             if(d.m) d.m.forEach((v, i) => {
-                if(v==='HW') { hw++; mStats[i]++; }
-                else if(v==='HR') { hr++; mStats[i]++; }
-                else if(v==='None') none++;
-                else if(v==='Glove') glove++;
+                if(v==='HW') { hw++; mStats[i].hw++; }
+                else if(v==='HR') { hr++; mStats[i].hr++; }
+                else if(v==='None') { none++; mStats[i].none++; }
+                else if(v==='Glove') { glove++; mStats[i].glove++; }
             });
-            if(d.equips) d.equips.forEach(v => eqTotal += v);
+            if(d.equips) d.equips.forEach(v => eqTotalRaw += v);
         });
 
-        document.getElementById('hw_val').innerText = ((hw / (n * 5)) * 100).toFixed(1) + `%`;
-        document.getElementById('hw_frac').innerText = `(${hw}/${n * 5})`;
-        document.getElementById('hr_val').innerText = ((hr / (n * 5)) * 100).toFixed(1) + `%`;
-        document.getElementById('hr_frac').innerText = `(${hr}/${n * 5})`;
-        document.getElementById('comp_val').innerText = (((hw + hr) / (n * 5)) * 100).toFixed(1) + `%`;
-        document.getElementById('comp_frac').innerText = `(${hw + hr}/${n * 5})`;
-        document.getElementById('equip_val').innerText = ((eqTotal / (n * 7)) * 100).toFixed(1) + `%`;
-        document.getElementById('equip_frac').innerText = `(${eqTotal}/${n * 7})`;
+        // Exact Formula mappings 
+        const totalCleaned = hw + hr; 
+        const totalOpp = hw + hr + none + glove; 
+        const totalEquipPossible = data.length * 7;
+        
+        // Hand Wash Proportion (Divide by total actual cleaned observations)
+        document.getElementById('hw_val').innerText = totalCleaned > 0 ? ((hw / totalCleaned) * 100).toFixed(1) + `%` : '0%';
+        document.getElementById('hw_frac').innerText = `(${hw}/${totalCleaned})`;
+        
+        // Hand Rub Proportion (Divide by total actual cleaned observations)
+        document.getElementById('hr_val').innerText = totalCleaned > 0 ? ((hr / totalCleaned) * 100).toFixed(1) + `%` : '0%';
+        document.getElementById('hr_frac').innerText = `(${hr}/${totalCleaned})`;
+        
+        // HW+HR Overall (Compliance rate uses overall Opportunities)
+        document.getElementById('comp_val').innerText = totalOpp > 0 ? ((totalCleaned / totalOpp) * 100).toFixed(1) + `%` : '0%';
+        document.getElementById('comp_frac').innerText = `(${totalCleaned}/${totalOpp})`;
+        
+        document.getElementById('equip_val').innerText = totalEquipPossible > 0 ? ((eqTotalRaw / totalEquipPossible) * 100).toFixed(1) + `%` : '0%';
+        document.getElementById('equip_frac').innerText = `(${eqTotalRaw}/${totalEquipPossible})`;
 
+        // Re-draw graphics
         drawPie(hw, hr, none, glove);
-        drawMomentBar(mStats, n);
-        drawDeptBar(data);
+        drawMomentBar(mStats);
         drawTrend(data);
-        drawEquipDeptChart(data);
-        renderTables(data, n);
-        renderEquipTable(data);
-        renderMomentTableDetail(data, n); 
+        drawDeptMomentChart(data);
+        drawRoleMomentChart(data);
+
+        // Populate Matrix reports
+        renderTables(data, mStats);
+        renderMatrixHorizontal(data, 'dept', 'matrixTableBody'); 
+        renderMatrixHorizontal(data, 'role', 'matrixRoleTableBody');
+        renderEquipDept(data);
     }
 
-    function drawPie(hw, hr, none, glove) {
-        if(charts.pie) charts.pie.destroy();
-        charts.pie = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: ['HW', 'HR', 'ไม่ล้างมือ', 'สวมถุงมือ'], datasets: [{ data: [hw, hr, none, glove], backgroundColor: ['#2ecc71', '#3498db', '#e74c3c', '#f1c40f'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } } } } });
-    }
-    function drawMomentBar(stats, n) {
-        if(charts.moment) charts.moment.destroy();
-        charts.moment = new Chart(document.getElementById('momentChart'), { type: 'bar', data: { labels: ["ก่อนสัมผัสผู้ป่วย", "ก่อนทำหัตถการปลอดเชื้อ", "หลังสัมผัสสารคัดหลั่งผู้ป่วย", "หลังสัมผัสผู้ป่วย", "หลังสัมผัสสิ่งรอบตัวผู้ป่วย"], datasets: [{ label: 'Compliance (%)', data: stats.map(s => ((s/n)*100).toFixed(1)), backgroundColor: '#1d976c', extraData: stats.map(s => `(${s}/${n})`) }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% ${ctx.dataset.extraData[ctx.dataIndex]}` } } }, scales: { y: { beginAtZero: true, max: 100, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } } } });
-    }
-    function drawDeptBar(data) {
-        if(charts.dept) charts.dept.destroy();
-        const depts = [...new Set(data.map(d => d.dept))];
-        const rawScores = depts.map(dn => { let f = data.filter(d => d.dept === dn); let pass = f.reduce((acc, curr) => acc + curr.m.filter(v => v === 'HW' || v === 'HR').length, 0); let total = f.length * 5; return { pct: ((pass / total) * 100).toFixed(1), frac: `(${pass}/${total})` }; });
-        charts.dept = new Chart(document.getElementById('deptChart'), { type: 'bar', data: { labels: depts, datasets: [{ label: 'Dept (%)', data: rawScores.map(r => r.pct), backgroundColor: '#48c6ef', extra: rawScores.map(r => r.frac) }] }, options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% ${ctx.dataset.extra[ctx.dataIndex]}` } } }, scales: { x: { beginAtZero: true, max: 100, ticks: { font: { size: 9 } } }, y: { ticks: { font: { size: 9 } } } } } });
-    }
-    function drawTrend(data) {
-        if(charts.trend) charts.trend.destroy();
-        const monthlyData = {};
-        database.forEach(d => { if(!d.obsDate) return; const month = d.obsDate.substring(0, 7); if(!monthlyData[month]) monthlyData[month] = { pass: 0, total: 0 }; d.m.forEach(v => { monthlyData[month].total++; if(v === 'HW' || v === 'HR') monthlyData[month].pass++; }); });
-        const labels = Object.keys(monthlyData).sort();
-        charts.trend = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: labels, datasets: [{ label: 'Trend (%)', data: labels.map(l => ((monthlyData[l].pass / monthlyData[l].total) * 100).toFixed(1)), extra: labels.map(l => `(${monthlyData[l].pass}/${monthlyData[l].total})`), borderColor: '#1d976c', fill: true, backgroundColor: 'rgba(29, 151, 108, 0.1)', tension: 0.3 }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% ${ctx.dataset.extra[ctx.dataIndex]}` } } }, scales: { y: { beginAtZero: true, max: 100, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } } } });
-    }
-    function drawEquipDeptChart(data) {
-        if(charts.equip) charts.equip.destroy();
-        const depts = [...new Set(data.map(d => d.dept))];
-        const rawScores = depts.map(dn => { let f = data.filter(d => d.dept === dn); let totalPossible = f.length * 7; let actualAvailable = f.reduce((acc, curr) => acc + curr.equips.reduce((a, b) => a + b, 0), 0); return { pct: ((actualAvailable / totalPossible) * 100).toFixed(1), frac: `(${actualAvailable}/${totalPossible})` }; });
-        charts.equip = new Chart(document.getElementById('equipDeptChart'), { type: 'bar', data: { labels: depts, datasets: [{ label: 'อุปกรณ์ (%)', data: rawScores.map(r => r.pct), backgroundColor: '#f39c12', extra: rawScores.map(r => r.frac) }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw}% ${ctx.dataset.extra[ctx.dataIndex]}` } } }, scales: { y: { beginAtZero: true, max: 100, ticks: { font: { size: 9 } } }, x: { ticks: { font: { size: 9 } } } } } });
+    // Map Horizontal Matrix data structures
+    function renderMatrixHorizontal(data, field, bodyId) {
+        const body = document.getElementById(bodyId);
+        body.innerHTML = '';
+        const keys = [...new Set(data.map(d => d[field]))].sort();
+        keys.forEach(keyVal => {
+            const filteredData = data.filter(d => d[field] === keyVal);
+            let row = `<tr><td class="text-start ps-2 bg-label">${keyVal}</td>`;
+            for (let mIdx = 0; mIdx < 5; mIdx++) {
+                const mTotal = filteredData.filter(d => d.m && d.m[mIdx] && d.m[mIdx] !== "").length;
+                const hwCount = filteredData.filter(d => d.m && d.m[mIdx] === 'HW').length;
+                const hrCount = filteredData.filter(d => d.m && d.m[mIdx] === 'HR').length;
+                const compCount = hwCount + hrCount;
+                const compPct = mTotal > 0 ? ((compCount / mTotal) * 100).toFixed(1) : 0;
+                row += `<td class="table-success">${compCount > 0 ? `<span class="cell-pct ${getPercentColor(compPct)}">${compPct}%</span><span class="cell-frac">(${compCount}/${mTotal})</span>` : "-"}</td>`;
+                ['HW', 'HR', 'None', 'Glove'].forEach(beh => {
+                    const count = filteredData.filter(d => d.m && d.m[mIdx] === beh).length;
+                    if (mTotal > 0 && count > 0) {
+                        const pct = ((count / mTotal) * 100).toFixed(1);
+                        row += `<td><span class="cell-pct ${getPercentColor(pct)}">${pct}%</span><span class="cell-frac">(${count}/${mTotal})</span></td>`;
+                    } else { row += `<td>-</td>`; }
+                });
+            }
+            row += `</tr>`; 
+            body.innerHTML += row;
+        });
     }
 
-    function renderTables(data, n) {
-        const mBody = document.getElementById('momentTableBody'); 
-        mBody.innerHTML = '';
-        const momentLabels = ["ก่อนสัมผัสผู้ป่วย", "ก่อนทำหัตถการปลอดเชื้อ", "หลังสัมผัสสารคัดหลั่งผู้ป่วย", "หลังสัมผัสผู้ป่วย", "หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
+    function renderTables(data, mStats) {
+        const mBody = document.getElementById('momentTableBody'); mBody.innerHTML = '';
         momentLabels.forEach((l, idx) => {
-            let s = {HW:0, HR:0, None:0, Glove:0};
-            data.forEach(d => { if(d.m) s[d.m[idx]]++; });
-            const fmt = (c) => { let pct = ((c/n)*100).toFixed(1); let colorClass = getPercentColor(pct); return `<span class="${colorClass}">${pct}%</span> <span class="text-muted">(${c}/${n})</span>`; };
-            mBody.innerHTML += `<tr><td class="text-start">${l}</td><td>${fmt(s.HW)}</td><td>${fmt(s.HR)}</td><td>${fmt(s.None)}</td><td>${fmt(s.Glove)}</td></tr>`;
+            const m = mStats[idx]; const total = m.hw + m.hr + m.none + m.glove;
+            const fmt = (c) => { if (total === 0 || c === 0) return "-"; let pct = ((c/total)*100).toFixed(1); return `<span class="${getPercentColor(pct)}">${pct}%</span> <br><small class="text-muted">(${c}/${total})</small>`; };
+            const hwHrSum = m.hw + m.hr;
+            const fmtTotal = () => { if (total === 0 || hwHrSum === 0) return "-"; let pct = ((hwHrSum / total) * 100).toFixed(1); return `<span class="${getPercentColor(pct)}">${pct}%</span> <br><small class="text-muted">(${hwHrSum}/${total})</small>`; };
+            mBody.innerHTML += `<tr><td class="text-start fw-bold bg-light">${l}</td><td class="table-primary">${fmtTotal()}</td><td>${fmt(m.hw)}</td><td>${fmt(m.hr)}</td><td>${fmt(m.none)}</td><td>${fmt(m.glove)}</td></tr>`;
         });
         renderTableFraction(data, 'dept', 'deptTableBody');
         renderTableFraction(data, 'role', 'roleTableBody');
     }
 
-    // แก้ไขฟังก์ชันใหม่: คำนวณ % จากตัวหารรวมทั้งหมด (n * 5)
-    function renderMomentTableDetail(data, n) {
-        const body = document.getElementById('momentDetailTableBody');
-        body.innerHTML = '';
-        const momentLabels = ["1. ก่อนสัมผัสผู้ป่วย", "2. ก่อนทำหัตถการปลอดเชื้อ", "3. หลังสัมผัสสารคัดหลั่งผู้ป่วย", "4. หลังสัมผัสผู้ป่วย", "5. หลังสัมผัสสิ่งรอบตัวผู้ป่วย"];
-        
-        // ตัวหารคือโอกาสทั้งหมด
-        const totalOpp = n * 5;
-
-        momentLabels.forEach((label, idx) => {
-            let s = { HW: 0, HR: 0, None: 0, Glove: 0 };
-            data.forEach(d => { if (d.m && d.m[idx]) s[d.m[idx]]++; });
-            
-            const fmt = (c) => {
-                let pct = totalOpp > 0 ? ((c / totalOpp) * 100).toFixed(1) : "0.0";
-                let colorClass = getPercentColor(pct);
-                return `<span class="${colorClass}">${pct}%</span><br><span class="text-muted" style="font-size:0.7rem">(${c}/${totalOpp})</span>`;
-            };
-            
-            body.innerHTML += `<tr><td class="text-start fw-bold">${label}</td><td>${fmt(s.HW)}</td><td>${fmt(s.HR)}</td><td>${fmt(s.None)}</td><td>${fmt(s.Glove)}</td></tr>`;
-        });
-    }
-
     function renderTableFraction(data, field, bodyId) {
         const body = document.getElementById(bodyId); body.innerHTML = '';
-        const keys = [...new Set(data.map(d => d[field]))];
+        const keys = [...new Set(data.map(d => d[field]))].sort();
         keys.forEach(k => {
-            let f = data.filter(d => d[field] === k);
-            let s = {HW:0, HR:0, None:0, Glove:0};
-            f.forEach(d => { if(d.m) d.m.forEach(v => s[v]++); });
-            const total = f.length * 5;
-            const fmt = (c) => { let pct = ((c/total)*100).toFixed(1); let colorClass = getPercentColor(pct); return `<span class="${colorClass}">${pct}%</span> <br><span class="text-muted" style="font-size:0.7rem">(${c}/${total})</span>`; };
-            body.innerHTML += `<tr><td>${k}</td><td>${fmt(s.HW)}</td><td>${fmt(s.HR)}</td><td>${fmt(s.None)}</td><td>${fmt(s.Glove)}</td></tr>`;
+            let f = data.filter(d => d[field] === k); let s = {HW:0, HR:0, None:0, Glove:0};
+            f.forEach(d => { if(d.m) d.m.forEach(v => { if(v) s[v]++; }); });
+            const total = s.HW + s.HR + s.None + s.Glove;
+            const fmt = (c) => { if (total === 0 || c === 0) return "-"; let pct = ((c/total)*100).toFixed(1); return `<span class="${getPercentColor(pct)}">${pct}%</span> <br><small class="text-muted">(${c}/${total})</small>`; };
+            const compSum = s.HW + s.HR; const compPct = total > 0 ? ((compSum / total) * 100).toFixed(1) : 0;
+            const compDisplay = compSum > 0 ? `<span class="${getPercentColor(compPct)} fw-bold">${compPct}%</span><br><small class="text-muted">(${compSum}/${total})</small>` : "-";
+            body.innerHTML += `<tr><td class="text-start ps-2 fw-bold bg-light">${k}</td><td class="table-success">${compDisplay}</td><td>${fmt(s.HW)}</td><td>${fmt(s.HR)}</td><td>${fmt(s.None)}</td><td>${fmt(s.Glove)}</td></tr>`;
         });
     }
 
-    function renderEquipTable(data) {
-        const body = document.getElementById('equipTableBody'); 
-        const summaryBody = document.getElementById('equipSummaryTableBody'); 
-        body.innerHTML = ''; summaryBody.innerHTML = '';
-        const depts = [...new Set(data.map(d => d.dept))];
-        depts.forEach(dn => {
-            let f = data.filter(d => d.dept === dn);
-            let row = `<tr><td class="text-start fw-bold" style="background-color: #f9f9f9;">${dn}</td>`;
+    function renderEquipDept(data) {
+        const body = document.getElementById('equipDeptTableBody'); body.innerHTML = '';
+        const depts = [...new Set(data.map(d => d.dept))].sort();
+        depts.forEach(dept => {
+            const f = data.filter(d => d.dept === dept); 
+            let row = `<tr><td class="text-start ps-2 fw-bold bg-light">${dept}</td>`;
+            let deptSumScores = 0;
             for(let i=0; i<7; i++) {
-                let count = f.filter(d => d.equips && d.equips[i] === 1).length;
-                let pct = ((count / f.length) * 100).toFixed(0);
-                let colorClass = getPercentColor(pct);
-                row += `<td><span class="${colorClass}">${pct}%</span><br><span style="font-size:0.7rem" class="text-muted">(${count}/${f.length})</span></td>`;
+                let score = f.reduce((acc, d) => acc + (d.equips ? d.equips[i] : 0), 0);
+                deptSumScores += score; let pct = f.length > 0 ? ((score / f.length) * 100).toFixed(1) : 0;
+                row += `<td>${score > 0 ? `<span class="${getPercentColor(pct)}">${pct}%<br><small class="text-muted">(${score}/${f.length})</small></span>` : "-"}</td>`;
             }
-            body.innerHTML += row + `</tr>`;
-            let soapOrAlcoCount = f.filter(d => d.equips && (d.equips[1] === 1 || d.equips[2] === 1 || d.equips[3] === 1)).length;
-            let summaryPct = ((soapOrAlcoCount / f.length) * 100).toFixed(0);
-            summaryBody.innerHTML += `<tr><td class="text-start small fw-bold">${dn}</td><td class="table-info"><span class="${getPercentColor(summaryPct)}">${summaryPct}%</span><br><span style="font-size:0.7rem" class="text-muted">(${soapOrAlcoCount}/${f.length})</span></td></tr>`;
+            let avg = (f.length > 0) ? ((deptSumScores / (f.length * 7)) * 100).toFixed(1) : 0;
+            row += `<td class="table-primary fw-bold">${avg > 0 ? `<span class="${getPercentColor(avg)}">${avg}%</span>` : "-"}</td></tr>`;
+            body.innerHTML += row;
         });
     }
 
+    // Chart layouts configuration
+    const commonYAxis = { beginAtZero: true, max: 100, ticks: { stepSize: 20 } };
+
+    // Graphics Draw Methods
+    function drawPie(hw, hr, none, glove) { 
+        if(charts.pie) charts.pie.destroy(); 
+        charts.pie = new Chart(document.getElementById('pieChart'), { 
+            type: 'doughnut', 
+            data: { labels: ['HW', 'HR', 'ไม่ล้างมือ', 'สวมถุงมือ'], datasets: [{ data: [hw, hr, none, glove], backgroundColor: ['#2ecc71', '#3498db', '#e74c3c', '#f1c40f'] }] }, 
+            options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' } 
+        }); 
+    }
+
+    function drawMomentBar(mStats) { 
+        if(charts.moment) charts.moment.destroy(); 
+        const scores = mStats.map(m => { const total = m.hw + m.hr + m.none + m.glove; return total > 0 ? (((m.hw + m.hr) / total) * 100).toFixed(1) : 0; });
+        charts.moment = new Chart(document.getElementById('momentChart'), { 
+            type: 'bar', data: { labels: ["M1", "M2", "M3", "M4", "M5"], datasets: [{ label: 'HW+HR (%)', data: scores, backgroundColor: '#16a085', borderRadius: 8 }] }, 
+            options: { maintainAspectRatio: false, scales: { y: commonYAxis } } 
+        }); 
+    }
+
+    function drawTrend(data) {
+        if(charts.trend) charts.trend.destroy();
+        const monthlyData = {};
+        database.forEach(d => { 
+            if(!d.obsDate) return; 
+            const month = d.obsDate.substring(0, 7); 
+            if(!monthlyData[month]) monthlyData[month] = { pass: 0, total: 0 }; 
+            if(d.m) d.m.forEach(v => { 
+                if(v){ 
+                    monthlyData[month].total++; 
+                    if(v === 'HW' || v === 'HR') monthlyData[month].pass++; 
+                } 
+            }); 
+        });
+        const labels = Object.keys(monthlyData).sort();
+        charts.trend = new Chart(document.getElementById('trendChart'), { 
+            type: 'line', data: { labels: labels, datasets: [{ label: 'Trend (%)', data: labels.map(l => ((monthlyData[l].pass / monthlyData[l].total) * 100).toFixed(1)), borderColor: '#16a085', tension: 0.4, fill: true, backgroundColor: 'rgba(22, 160, 133, 0.1)' }] }, 
+            options: { maintainAspectRatio: false, scales: { y: commonYAxis } } 
+        });
+    }
+
+    function drawDeptMomentChart(data) {
+        if(charts.deptMoment) charts.deptMoment.destroy();
+        const depts = [...new Set(data.map(d => d.dept))].sort(); const colors = ['#1abc9c', '#3498db', '#9b59b6', '#f1c40f', '#e67e22'];
+        const datasets = [0, 1, 2, 3, 4].map(mIdx => ({ label: `M${mIdx+1}`, data: depts.map(dept => { const f = data.filter(d => d.dept === dept); const total = f.filter(d => d.m && d.m[mIdx] && d.m[mIdx] !== "").length; const comp = f.filter(d => d.m && (d.m[mIdx] === 'HW' || d.m[mIdx] === 'HR')).length; return total > 0 ? ((comp / total) * 100).toFixed(1) : 0; }), backgroundColor: colors[mIdx], borderRadius: 4 }));
+        charts.deptMoment = new Chart(document.getElementById('deptMomentChart'), { type: 'bar', data: { labels: depts, datasets: datasets }, options: { maintainAspectRatio: false, scales: { y: commonYAxis } } });
+    }
+
+    function drawRoleMomentChart(data) {
+        if(charts.roleMoment) charts.roleMoment.destroy();
+        const roles = [...new Set(data.map(d => d.role))].sort(); const colors = ['#1abc9c', '#3498db', '#9b59b6', '#f1c40f', '#e67e22'];
+        const datasets = [0, 1, 2, 3, 4].map(mIdx => ({ label: `M${mIdx+1}`, data: roles.map(role => { const f = data.filter(d => d.role === role); const total = f.filter(d => d.m && d.m[mIdx] && d.m[mIdx] !== "").length; const comp = f.filter(d => d.m && (d.m[mIdx] === 'HW' || d.m[mIdx] === 'HR')).length; return total > 0 ? ((comp / total) * 100).toFixed(1) : 0; }), backgroundColor: colors[mIdx], borderRadius: 4 }));
+        charts.roleMoment = new Chart(document.getElementById('roleMomentChart'), { type: 'bar', data: { labels: roles, datasets: datasets }, options: { maintainAspectRatio: false, scales: { y: commonYAxis } } });
+    }
+
+    // Dynamic Excel Exporter
     function exportToExcel() {
-        if(database.length === 0) { alert("ไม่มีข้อมูลสำหรับการส่งออก"); return; }
-        const exportData = database.map(d => {
-            const cpCount = d.m ? d.m.filter(v => v === 'HW' || v === 'HR').length : 0;
-            const eqCount = d.equips ? d.equips.reduce((a, b) => a + b, 0) : 0;
-            const hasSoapOrAlco = d.equips ? (d.equips[1] === 1 || d.equips[2] === 1 || d.equips[3] === 1) : false;
+        if (!currentFilteredData || currentFilteredData.length === 0) { 
+            return showCustomAlert("ไม่มีข้อมูลสำหรับการ Export", "โปรดเพิ่มข้อมูลหรือปรับแต่งค่าเวลาเพื่อให้มีแถวข้อมูลขั้นต่ำ", false); 
+        }
+        
+        const wb = XLSX.utils.book_new();
+
+        // Sheet 1: Raw Data
+        const rawSheetData = currentFilteredData.map(d => ({
+            "วันที่": d.obsDate,
+            "แผนก": d.dept,
+            "วิชาชีพ": d.role,
+            "M1": d.m[0] || "-", "M2": d.m[1] || "-", "M3": d.m[2] || "-", "M4": d.m[3] || "-", "M5": d.m[4] || "-",
+            "อ่างล้างมือ": d.equips[0], "สบู่เหลว": d.equips[1], "Chlorhexidine": d.equips[2], 
+            "Alcohol rub": d.equips[3], "กระดาษเช็ดมือ": d.equips[4], "โปสเตอร์": d.equips[5], "ถังขยะ": d.equips[6]
+        }));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rawSheetData), "Raw_Data");
+
+        // Sheet 2: Department Summary
+        const depts = [...new Set(currentFilteredData.map(d => d.dept))].sort();
+        const deptSummary = depts.map(dept => {
+            const f = currentFilteredData.filter(d => d.dept === dept);
+            let s = {HW:0, HR:0, None:0, Glove:0};
+            f.forEach(d => { if(d.m) d.m.forEach(v => { if(v) s[v]++; }); });
+            const total = s.HW + s.HR + s.None + s.Glove;
             return {
-                "วันที่": d.obsDate || "", "แผนก": d.dept || "", "วิชาชีพ": d.role || "",
-                "Moment 1": d.m ? d.m[0] : "", "Moment 2": d.m ? d.m[1] : "", "Moment 3": d.m ? d.m[2] : "", "Moment 4": d.m ? d.m[3] : "", "Moment 5": d.m ? d.m[4] : "",
-                "Compliance (%)": ((cpCount/5)*100).toFixed(1), "Hand Hygiene (Score/Total)": `${cpCount}/5`,
-                "กลุ่มน้ำยาล้างมือ (สรุป)": hasSoapOrAlco ? "พร้อม" : "ไม่พร้อม",
-                "อุปกรณ์ 1 (อ่าง)": d.equips ? (d.equips[0] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 2 (สบู่)": d.equips ? (d.equips[1] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 3 (4%CHG)": d.equips ? (d.equips[2] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 4 (Alcohol)": d.equips ? (d.equips[3] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 5 (กระดาษ)": d.equips ? (d.equips[4] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 6 (โปสเตอร์)": d.equips ? (d.equips[5] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "อุปกรณ์ 7 (ถังขยะ)": d.equips ? (d.equips[6] === 1 ? "พร้อม" : "ไม่พร้อม") : "",
-                "ความพร้อมอุปกรณ์รวม (%)": ((eqCount/7)*100).toFixed(1)
+                "แผนก": dept,
+                "HW+HR (%)": total > 0 ? ((s.HW + s.HR) / total * 100).toFixed(2) : "0.00",
+                "HW (ครั้ง)": s.HW, "HR (ครั้ง)": s.HR, "ไม่ล้างมือ (ครั้ง)": s.None, "สวมถุงมือ (ครั้ง)": s.Glove, "โอกาสทั้งหมด": total
             };
         });
-        const ws = XLSX.utils.json_to_sheet(exportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "HandHygiene_Data");
-        XLSX.writeFile(wb, "IC_HandHygiene_Full_Report.xlsx");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(deptSummary), "Dept_Summary");
+
+        // Sheet 3: Equipment Summary
+        const equipSummary = depts.map(dept => {
+            const f = currentFilteredData.filter(d => d.dept === dept);
+            const scores = Array(7).fill(0);
+            f.forEach(d => { if(d.equips) d.equips.forEach((v, i) => scores[i] += v); });
+            return {
+                "แผนก": dept,
+                "อ่างล้างมือ (%)": f.length > 0 ? (scores[0]/f.length*100).toFixed(2) : 0,
+                "สบู่เหลว (%)": f.length > 0 ? (scores[1]/f.length*100).toFixed(2) : 0,
+                "Chlorhexidine (%)": f.length > 0 ? (scores[2]/f.length*100).toFixed(2) : 0,
+                "Alcohol rub (%)": f.length > 0 ? (scores[3]/f.length*100).toFixed(2) : 0,
+                "ภาพรวมอุปกรณ์ (%)": f.length > 0 ? (scores.reduce((a,b)=>a+b,0)/(f.length*7)*100).toFixed(2) : 0
+            };
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equipSummary), "Equipment_Summary");
+
+        XLSX.writeFile(wb, `IC_HandHygiene_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 </script>
 </body>
